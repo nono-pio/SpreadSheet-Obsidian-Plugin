@@ -1,0 +1,203 @@
+.icon-add-columns {
+	stroke: var(--icon-color);
+	aspect-ratio: 1/1;
+	height: 1.5rem;
+	cursor: var(--cursor);
+}
+
+/* Option */
+.options {
+	position: absolute;
+
+	width: calc(100% - 12px);
+	height: 75px;
+	right: 12px;
+
+	z-index: 1;
+
+	background-color: var(--background-primary-alt);
+	border-bottom: 1px solid var(--table-border-color);
+
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 5px;
+	align-content: center;
+}
+
+.options button {
+	margin: 0;
+	height: 30pt;
+	background-color: var(--interactive-normal);
+	color: var(--icon-color);
+	box-shadow: var(--input-shadow);
+}
+
+.options button svg {
+	height: 24px;
+}
+
+.options button:hover {
+	background-color: var(--interactive-hover);
+	box-shadow: var(--input-shadow-hover);
+}
+
+.options .seperator {
+	border-left: 2px solid var(--color-base-30);
+	margin: 0 5px 0 5px;
+}
+
+/* Top of the table */
+.top-table {
+	height: 75px;
+}
+
+/* Table */
+.ss-table {
+	overflow: auto;
+	border-collapse: collapse;
+}
+
+/* All Cell */
+.ss-table th {
+	min-width: 75px;
+	min-height: 35px;
+	padding: var(--size-2-2) var(--size-4-2);
+
+	font-size: var(--table-header-size);
+	font-weight: var(--table-header-weight);
+
+	color: var(--table-header-color);
+	font-family: var(--table-header-font);
+	text-align: left;
+	line-height: var(--line-height-tight);
+
+	border: var(--table-border-width) solid var(--table-border-color);
+}
+
+/* Active Cell */
+.ss-table tbody .cell-active {
+	box-shadow: inset 0px 0px 3px 2px var(--color-accent);
+	transition: box-shadow 0.5s ease-in-out;
+}
+
+/* Cell in line of active cell */
+.ss-table tbody .cell-line {
+	background-color: var(--color-base-05);
+}
+
+/* Column Cell */
+.ss-table thead th {
+	top: 75px;
+	position: sticky;
+
+	background-color: var(--color-base-10);
+	border-top: none;
+}
+
+/* Active Column Cell */
+.ss-table thead .column-active {
+	/*background-color: var(--color-base-20);*/
+	box-shadow: inset 0 -12px 10px -10px var(--color-accent);
+	transition: box-shadow 0.3s ease-in-out;
+}
+
+/* Row Cell */
+.ss-table th:first-child {
+	left: 0;
+	position: sticky;
+
+	background-color: var(--color-base-10);
+	border-left: none;
+}
+
+/* Active Row Cell */
+.ss-table tbody tr th.row-active {
+	/*background-color: var(--color-base-20) !important;*/
+	box-shadow: inset -12px 0 10px -10px var(--color-accent);
+	transition: box-shadow 0.3s ease-in-out;
+}
+
+/* First Cell */
+.empty-case {
+	top: 0;
+	left: 0;
+	position: absolute;
+	z-index: 9999;
+}
+
+/* Selection cells */
+.selection {
+	position: absolute;
+	border: 2px solid var(--color-accent);
+	pointer-events: none;
+	transition: all 0.1s ease-in-out;
+}
+
+/* Sheets Menu */
+.sheets {
+	background-color: var(--color-base-20);
+
+	bottom: 12px;
+	right: 12px;
+	width: calc(100% - 12px);
+
+	position: absolute;
+
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	justify-content: flex-start;
+	align-items: center;
+	gap: 10px;
+}
+
+.sheets > ul {
+	display: flex;
+	flex-direction: row;
+
+	list-style-type: none;
+
+	gap: 10px;
+}
+
+/* All Sheet */
+.sheets > ul > li {
+	padding: var(--size-4-1) var(--size-4-3);
+	height: var(--input-height);
+
+	background-color: var(--interactive-normal);
+	box-shadow: var(--input-shadow);
+
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+
+	color: var(--text-normal);
+	font-size: var(--font-ui-small);
+	font-weight: var(--input-font-weight);
+	font-family: inherit;
+
+	border-radius: var(--button-radius);
+	border: 0;
+	outline: none;
+
+	cursor: var(--cursor);
+
+	user-select: none;
+	white-space: nowrap;
+}
+
+.sheet-hover {
+	border: 1px solid var(--color-accent) !important;
+}
+
+.sheet-active {
+	border: 1px solid blue !important;
+}
+
+/**/
+.view-content {
+	padding: 0 !important;
+}
