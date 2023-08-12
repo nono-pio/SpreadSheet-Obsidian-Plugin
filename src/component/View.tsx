@@ -15,10 +15,17 @@ export interface ViewProps {
 
 const View = ({ dataManager }: ViewProps) => {
 	const [tableData, setTableData] = useTableData();
+	if (tableData.needUpdate) {
+		setTableData({ needUpdate: false });
+	}
 
 	return (
 		<React.StrictMode>
-			<Options />
+			<Options
+				dataManager={dataManager}
+				tableData={tableData}
+				setTableData={setTableData}
+			/>
 			<SSTable
 				dataManager={dataManager}
 				tableData={tableData}

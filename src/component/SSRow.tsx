@@ -19,9 +19,10 @@ const SSRow = ({
 	setTableData,
 	select,
 }: RowProps) => {
-	const cell = (colIndex: number) => (
+	const cell = (colIndex: number, style: React.CSSProperties | undefined) => (
 		<th
 			key={colIndex}
+			style={style}
 			onMouseDown={() => handleMouseDown(colIndex)}
 			onMouseUp={handleMouseUp}
 			onMouseEnter={() => handleMouseEnter(colIndex)}
@@ -31,9 +32,13 @@ const SSRow = ({
 		</th>
 	);
 
-	const activeCell = (colIndex: number) => (
+	const activeCell = (
+		colIndex: number,
+		style: React.CSSProperties | undefined
+	) => (
 		<th
 			key={colIndex}
+			style={style}
 			contentEditable
 			suppressContentEditableWarning
 			onMouseDown={() => handleMouseDown(colIndex)}
@@ -96,13 +101,14 @@ const SSRow = ({
 	return (
 		<>
 			{columns.map((_, colIndex) => {
+				const style = dataManager.getCellConfig(colIndex, rowIndex);
 				if (
 					rowIndex === tableData.activeCell[0] &&
 					colIndex === tableData.activeCell[1]
 				) {
-					return activeCell(colIndex);
+					return activeCell(colIndex, style);
 				} else {
-					return cell(colIndex);
+					return cell(colIndex, style);
 				}
 			})}
 		</>

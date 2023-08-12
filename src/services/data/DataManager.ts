@@ -92,11 +92,13 @@ export class DataManager {
 	}
 
 	changeCell(column: number, row: number, value: string | null) {
-		if (this.cellInRange(column, row)) {
-			const cell = this.getCell(column, row);
-			this.data.sheets[this.currentSheet].table[row][column] = value
-				? parserCell(value, cell.config)
-				: new DefaultCell();
+		const cell = this.getCell(column, row);
+
+		if (cell) {
+			this.data.sheets[this.currentSheet].table[row][column] =
+				value !== null && value !== ""
+					? parserCell(value, cell.config)
+					: new DefaultCell("", cell.config);
 			return;
 		}
 
@@ -104,6 +106,15 @@ export class DataManager {
 			return;
 		}
 
+		this.updateTable(column, row);
+
+		this.data.sheets[this.currentSheet].table[row][column] = parserCell(
+			value,
+			null
+		);
+	}
+
+	updateTable(column: number, row: number) {
 		const difCol = column + 1 - this.getColumnsLenght();
 		if (difCol > 0) {
 			this.addColumns(difCol);
@@ -113,11 +124,6 @@ export class DataManager {
 		if (difRow > 0) {
 			this.addRows(difRow);
 		}
-
-		this.data.sheets[this.currentSheet].table[row][column] = parserCell(
-			value,
-			null
-		);
 
 		console.log(this.getSheet().table);
 	}
@@ -146,8 +152,50 @@ export class DataManager {
 		return "";
 	}
 
+	getCellConfig(
+		column: number,
+		row: number
+	): React.CSSProperties | undefined {
+		if (this.cellInRange(column, row)) {
+			const cell = this.getSheet().table[row][column];
+			if (cell.config) {
+				return cell.config.generateStyle(this);
+			} else {
+				return undefined;
+			}
+		}
+
+		return undefined;
+	}
+
+	getForEachCellSelection(
+		selection: [number, number, number, number],
+		callback: (cell: Cell | undefined, row: number, col: number) => void
+	) {
+		for (
+			let rowIndex = selection[0];
+			rowIndex <= selection[2];
+			rowIndex++
+		) {
+			for (
+				let colIndex = selection[1];
+				colIndex <= selection[3];
+				colIndex++
+			) {
+				callback(this.getCell(colIndex, rowIndex), rowIndex, colIndex);
+			}
+		}
+	}
+
+	getColor(colorText: number): string {
+		return this.data.colors[colorText];
+	}
+
 	getCell(column: number, row: number) {
-		return this.getSheet().table[row][column];
+		if (this.cellInRange(column, row)) {
+			return this.getSheet().table[row][column];
+		}
+		return undefined;
 	}
 
 	getData() {

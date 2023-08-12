@@ -10,6 +10,7 @@ const useTableData: () => [
 		selection: [-1, -1, -1, -1],
 		selectionBound: [undefined, undefined, undefined, undefined],
 		mousePress: false,
+		needUpdate: false,
 	});
 
 	const updateTable = (updatedTable: Partial<TableData>) => {
@@ -32,4 +33,5 @@ export class TableData {
 		height: number | undefined
 	];
 	mousePress: boolean;
+	needUpdate: boolean;
 }

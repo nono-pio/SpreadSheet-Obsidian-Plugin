@@ -67,17 +67,107 @@ const SStable = ({ dataManager, tableData, setTableData }: TableProps) => {
 		navigator.clipboard.writeText(result);
 	}
 
+	function deleteSelection() {
+		setTableData({ needUpdate: true });
+		dataManager.getForEachCellSelection(
+			tableData.selection,
+			(_, row, col) => {
+				dataManager.changeCell(col, row, "");
+			}
+		);
+	}
+
+	async function paste() {
+		const data = await navigator.clipboard.readText();
+		const subTable = data.split("\n").map((line) => line.split("\t"));
+
+		for (let r = 0; r < subTable.length; r++) {
+			for (let c = 0; c < subTable[0].length; c++) {
+				dataManager.changeCell(
+					c + tableData.startSelection[1],
+					r + tableData.startSelection[0],
+					subTable[r][c]
+				);
+			}
+		}
+
+		setTableData({ needUpdate: true });
+	}
+
 	function keyDownEvent(key: string, keyCtrl: boolean) {
 		switch (key) {
 			case "c":
 				copy();
 				break;
 			case "v":
+				paste();
 				break;
 			case "x":
+				copy();
+				deleteSelection();
 				break;
 			case "Delete" || "Backslash":
+				deleteSelection();
 				break;
+			case "ArrowUp": {
+				const startSelection: [number, number] = [
+					Math.max(tableData.startSelection[0] - 1, 0),
+					tableData.startSelection[1],
+				];
+				select([...startSelection, ...startSelection], {
+					mousePress: false,
+					startSelection: startSelection,
+				});
+				break;
+			}
+			case "ArrowDown": {
+				const startSelection: [number, number] = [
+					Math.min(tableData.startSelection[0] + 1, rows.length - 1),
+					tableData.startSelection[1],
+				];
+				select([...startSelection, ...startSelection], {
+					mousePress: false,
+					startSelection: startSelection,
+				});
+				break;
+			}
+			case "ArrowLeft": {
+				const startSelection: [number, number] = [
+					tableData.startSelection[0],
+					Math.max(tableData.startSelection[1] - 1, 0),
+				];
+				select([...startSelection, ...startSelection], {
+					mousePress: false,
+					startSelection: startSelection,
+				});
+				break;
+			}
+			case "ArrowRight": {
+				const startSelection: [number, number] = [
+					tableData.startSelection[0],
+					Math.min(
+						tableData.startSelection[1] + 1,
+						columns.length - 1
+					),
+				];
+				select([...startSelection, ...startSelection], {
+					mousePress: false,
+					startSelection: startSelection,
+				});
+				break;
+			}
+			case "Enter": {
+				const startSelection: [number, number] = [
+					Math.min(tableData.startSelection[0] + 1, rows.length - 1),
+					tableData.startSelection[1],
+				];
+				select([...startSelection, ...startSelection], {
+					mousePress: false,
+					startSelection: startSelection,
+					activeCell: [-1, -1],
+				});
+				break;
+			}
 		}
 	}
 
@@ -107,9 +197,13 @@ const SStable = ({ dataManager, tableData, setTableData }: TableProps) => {
 											: ""
 									}
 									onClick={() =>
-										setTableData({
-											activeCell: [-1, index],
-										})
+										select(
+											[0, index, rows.length - 1, index],
+											{
+												startSelection: [0, index],
+												mousePress: false,
+											}
+										)
 									}
 								>
 									{column.getText(index)}
@@ -139,9 +233,18 @@ const SStable = ({ dataManager, tableData, setTableData }: TableProps) => {
 											: ""
 									}
 									onClick={() =>
-										setTableData({
-											activeCell: [index, -1],
-										})
+										select(
+											[
+												index,
+												0,
+												index,
+												columns.length - 1,
+											],
+											{
+												startSelection: [index, 0],
+												mousePress: false,
+											}
+										)
 									}
 								>
 									{row.getText(index)}

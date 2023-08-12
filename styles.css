@@ -38,6 +38,10 @@
 	height: 24px;
 }
 
+.options button input[type="color"] {
+	margin-left: 5px;
+}
+
 .options button:hover {
 	background-color: var(--interactive-hover);
 	box-shadow: var(--input-shadow-hover);
@@ -67,8 +71,9 @@
 
 	font-size: var(--table-header-size);
 	font-weight: var(--table-header-weight);
+	font-weight: normal;
 
-	color: var(--table-header-color);
+	color: var(--color-base-100);
 	font-family: var(--table-header-font);
 	text-align: left;
 	line-height: var(--line-height-tight);
@@ -101,6 +106,7 @@
 	/*background-color: var(--color-base-20);*/
 	box-shadow: inset 0 -12px 10px -10px var(--color-accent);
 	transition: box-shadow 0.3s ease-in-out;
+	z-index: 2;
 }
 
 /* Row Cell */
@@ -120,11 +126,8 @@
 }
 
 /* First Cell */
-.empty-case {
-	top: 0;
-	left: 0;
-	position: absolute;
-	z-index: 9999;
+table.ss-table .empty-case {
+	z-index: 3;
 }
 
 /* Selection cells */

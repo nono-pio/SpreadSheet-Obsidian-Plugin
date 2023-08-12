@@ -1,8 +1,11 @@
+import * as CSS from "csstype";
+import { DataManager } from "../data/DataManager";
+
 export default class CellConfig {
 	alignment: Alignment = Alignment.Left;
 
-	colorText = -1;
-	colorBackground = -1;
+	colorText: number | null = null;
+	colorBackground: number | null = null;
 
 	textBold = false;
 	textItalic = false;
@@ -32,6 +35,35 @@ export default class CellConfig {
 		return this;
 	}
 
+	generateStyle(dataManager: DataManager): React.CSSProperties {
+		return {
+			fontWeight: this.textBold ? "bold" : "normal",
+			fontStyle: this.textItalic ? "italic" : "normal",
+			textAlign: this.generateAlignement(),
+			color:
+				this.colorText !== null
+					? dataManager.getColor(this.colorText)
+					: "inherit",
+			backgroundColor:
+				this.colorBackground !== null
+					? dataManager.getColor(this.colorBackground)
+					: "inherit",
+		};
+	}
+
+	generateAlignement(): CSS.Property.TextAlign | undefined {
+		switch (this.alignment) {
+			case Alignment.Left:
+				return "left";
+			case Alignment.Center:
+				return "center";
+			case Alignment.Right:
+				return "right";
+			default:
+				return undefined;
+		}
+	}
+
 	getString() {
 		let result = "";
 
@@ -41,13 +73,13 @@ export default class CellConfig {
 			result += "$c";
 		}
 
-		if (this.colorText !== -1) {
+		if (this.colorText !== null) {
 			result +=
 				"$t" +
 				(this.colorText < 10 ? "0" + this.colorText : this.colorText);
 		}
 
-		if (this.colorBackground !== -1) {
+		if (this.colorBackground !== null) {
 			result +=
 				"$b" +
 				(this.colorBackground < 10

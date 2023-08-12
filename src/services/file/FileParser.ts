@@ -65,12 +65,12 @@ export function parserCell(value: string, config: CellConfig | null): Cell {
 export function csvParserCell(value: string): Cell {
 	let config: null | CellConfig = null;
 
-	while (value.charAt(0) === "\\") {
+	while (value.startsWith("$")) {
 		let isModifier = false;
 		for (const modifier of modifiers) {
 			if (value.startsWith(modifier.ID)) {
-				const id = value.substring(0, modifier.idSize - 1);
-				value = value.substring(modifier.idSize, value.length - 1);
+				const id = value.substring(0, modifier.idSize);
+				value = value.substring(modifier.idSize, value.length);
 
 				config = modifier.configOption(
 					config === null ? new CellConfig() : config,

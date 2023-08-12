@@ -1,9 +1,50 @@
 import * as React from "react";
+import CellConfig, { Alignment } from "src/services/cell/CellConfig";
+import { TableProps } from "./SSTable";
 
-const Options = () => {
+const style = getComputedStyle(document.body);
+const colorBase100 = style.getPropertyValue("--color-base-100").substring(1);
+const colorBase00 = style.getPropertyValue("--color-base-00").substring(1);
+
+const Options = ({ dataManager, tableData, setTableData }: TableProps) => {
+	const colorTextRef = React.useRef<HTMLInputElement>(null);
+	const colorBgRef = React.useRef<HTMLInputElement>(null);
+
+	function optionClick(
+		changeConfig: (
+			config: CellConfig,
+			isMultipleCell: boolean
+		) => CellConfig
+	) {
+		setTableData({ needUpdate: true });
+		const isMultipleCell = !(
+			tableData.selection[0] === tableData.selection[2] &&
+			tableData.selection[1] === tableData.selection[3]
+		);
+		dataManager.getForEachCellSelection(tableData.selection, (cell) => {
+			if (!cell) {
+				return;
+			}
+			cell.config = changeConfig(
+				cell.config ? cell.config : new CellConfig(),
+				isMultipleCell
+			);
+		});
+	}
+
 	return (
 		<div className="options">
-			<button>
+			<button
+				onClick={() =>
+					optionClick((config, isMultipleCell) =>
+						config.setBold(
+							isMultipleCell // toggle if one cell but set bold if multiple cells
+								? true
+								: !config.textBold
+						)
+					)
+				}
+			>
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
 					<path
 						fill="currentColor"
@@ -11,7 +52,17 @@ const Options = () => {
 					></path>
 				</svg>
 			</button>
-			<button>
+			<button
+				onClick={() =>
+					optionClick((config, isMultipleCell) =>
+						config.setItalic(
+							isMultipleCell // toggle if one cell but set bold if multiple cells
+								? true
+								: !config.textItalic
+						)
+					)
+				}
+			>
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
 					<path
 						fill="currentColor"
@@ -20,7 +71,13 @@ const Options = () => {
 				</svg>
 			</button>
 			<div className="seperator"></div>
-			<button>
+			<button
+				onClick={() =>
+					optionClick((config) =>
+						config.setAlignement(Alignment.Left)
+					)
+				}
+			>
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
 					<path
 						fill="currentColor"
@@ -28,7 +85,13 @@ const Options = () => {
 					></path>
 				</svg>
 			</button>
-			<button>
+			<button
+				onClick={() =>
+					optionClick((config) =>
+						config.setAlignement(Alignment.Center)
+					)
+				}
+			>
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
 					<path
 						fill="currentColor"
@@ -36,7 +99,13 @@ const Options = () => {
 					></path>
 				</svg>
 			</button>
-			<button>
+			<button
+				onClick={() =>
+					optionClick((config) =>
+						config.setAlignement(Alignment.Right)
+					)
+				}
+			>
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
 					<path
 						fill="currentColor"
@@ -45,26 +114,55 @@ const Options = () => {
 				</svg>
 			</button>
 			<div className="seperator"></div>
-			<button>
+			<button
+				onClick={() =>
+					optionClick((config) =>
+						config.setTextColor(
+							dataManager.addColor(
+								colorTextRef.current
+									? colorTextRef.current.value
+									: "#FF0000"
+							)
+						)
+					)
+				}
+			>
 				<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
 					<path
 						fill="currentColor"
 						d="M15.111,15a1,1,0,0,0,1,1H20a1,1,0,0,0,0-2H18.676L13.705,1.627A1,1,0,0,0,12.777,1H11.223a1,1,0,0,0-.928.627L5.324,14H4a1,1,0,0,0,0,2H7.889a1,1,0,0,0,0-2h-.41l1.607-4h5.828l1.607,4h-.41A1,1,0,0,0,15.111,15ZM9.89,8,11.9,3h.2L14.11,8ZM22,18H2a1,1,0,0,0-1,1v3a1,1,0,0,0,1,1H22a1,1,0,0,0,1-1V19A1,1,0,0,0,22,18Zm-1,3H3V20H21Z"
 					/>
 				</svg>
+				<input
+					type="color"
+					ref={colorTextRef}
+					defaultValue={colorBase100}
+				/>
 			</button>
-			<button>
+			<button
+				onClick={() =>
+					optionClick((config) =>
+						config.setBackgroundColor(
+							dataManager.addColor(
+								colorBgRef.current
+									? colorBgRef.current.value
+									: "#FF0000"
+							)
+						)
+					)
+				}
+			>
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
 					<path
 						fill="currentColor"
-						d="M7.293,16.302l-1.155,1.13c0,0-0.138,0.134-0.138,0.577v3c0,1.104-0.896,2-2,2s-2-0.896-2-2v-4
-	c0-2.01,1.332-5,5-5l4.585,0.001L7.293,16.302z M17,17.29c0.553,0,1-0.447,1-1V7c0-2.823,2.504-2.994,2.994-3
-	C21.496,4.006,24,4.177,24,7v4.528l2,2V7c0-3.955-3.271-5-5-5s-5,1.045-5,5v9.29C16,16.843,16.447,17.29,17,17.29z M29.586,18.494
-	L19,8v8.29c0,1.103-0.897,2-2,2c-1.103,0-2-0.897-2-2v-6.281l-8,8l11.586,11.485c0.778,0.778,2.051,0.778,2.828,0l8.172-8.172
-	C30.364,20.545,30.364,19.272,29.586,18.494z M4,24.977c-1.105,0-2,0.895-2,2c0,1.105,0.895,2,2,2s2-0.895,2-2
-	C6,25.873,5.105,24.977,4,24.977z"
+						d="M7.293,16.302l-1.155,1.13c0,0-0.138,0.134-0.138,0.577v3c0,1.104-0.896,2-2,2s-2-0.896-2-2v-4 c0-2.01,1.332-5,5-5l4.585,0.001L7.293,16.302z M17,17.29c0.553,0,1-0.447,1-1V7c0-2.823,2.504-2.994,2.994-3C21.496,4.006,24,4.177,24,7v4.528l2,2V7c0-3.955-3.271-5-5-5s-5,1.045-5,5v9.29C16,16.843,16.447,17.29,17,17.29z M29.586,18.494L19,8v8.29c0,1.103-0.897,2-2,2c-1.103,0-2-0.897-2-2v-6.281l-8,8l11.586,11.485c0.778,0.778,2.051,0.778,2.828,0l8.172-8.172C30.364,20.545,30.364,19.272,29.586,18.494z M4,24.977c-1.105,0-2,0.895-2,2c0,1.105,0.895,2,2,2s2-0.895,2-2C6,25.873,5.105,24.977,4,24.977z"
 					/>
 				</svg>
+				<input
+					type="color"
+					ref={colorBgRef}
+					defaultValue={colorBase00}
+				/>
 			</button>
 		</div>
 	);
