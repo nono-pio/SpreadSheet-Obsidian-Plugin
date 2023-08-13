@@ -1,4 +1,5 @@
 import * as React from "react";
+import Cell from "src/services/cell/Cell";
 import CellConfig, { Alignment } from "src/services/cell/CellConfig";
 import { TableProps } from "./SSTable";
 
@@ -13,35 +14,68 @@ const Options = ({ dataManager, tableData, setTableData }: TableProps) => {
 	function optionClick(
 		changeConfig: (
 			config: CellConfig,
-			isMultipleCell: boolean
-		) => CellConfig
+			isMultipleCell: boolean,
+			data: unknown
+		) => CellConfig,
+		getSectionData: (
+			selectionCells: (Cell | undefined)[][]
+		) => unknown = () => undefined
 	) {
-		setTableData({ needUpdate: true });
+		if (tableData.selection.every((v) => v === -1)) {
+			return;
+		}
+
 		const isMultipleCell = !(
 			tableData.selection[0] === tableData.selection[2] &&
 			tableData.selection[1] === tableData.selection[3]
 		);
-		dataManager.getForEachCellSelection(tableData.selection, (cell) => {
-			if (!cell) {
-				return;
-			}
-			cell.config = changeConfig(
-				cell.config ? cell.config : new CellConfig(),
-				isMultipleCell
-			);
-		});
+		dataManager.updateTable(tableData.selection[3], tableData.selection[2]);
+		const selectionCells = dataManager.getSelectionCells(
+			tableData.selection
+		);
+		const data = getSectionData(selectionCells);
+		selectionCells.forEach((v) =>
+			v.forEach((cell) => {
+				if (cell)
+					cell.config = changeConfig(
+						cell.config ? cell.config : new CellConfig(),
+						isMultipleCell,
+						data
+					);
+			})
+		);
+
+		setTableData({ needUpdate: true });
 	}
 
 	return (
 		<div className="options">
 			<button
 				onClick={() =>
-					optionClick((config, isMultipleCell) =>
-						config.setBold(
-							isMultipleCell // toggle if one cell but set bold if multiple cells
-								? true
-								: !config.textBold
-						)
+					optionClick(
+						(config, isMultipleCell, majorityBold) =>
+							config.setBold(
+								isMultipleCell // toggle if one cell but set bold if multiple cells
+									? !majorityBold
+									: !config.textBold
+							),
+						(cells) => {
+							let nbBold = 0;
+							cells.forEach((v) =>
+								v.forEach((cell) => {
+									if (
+										cell &&
+										cell.config &&
+										cell.config.textBold
+									) {
+										nbBold++;
+									}
+								})
+							);
+							return (
+								nbBold / (cells.length * cells[0].length) > 0.5
+							);
+						}
 					)
 				}
 			>
@@ -54,12 +88,31 @@ const Options = ({ dataManager, tableData, setTableData }: TableProps) => {
 			</button>
 			<button
 				onClick={() =>
-					optionClick((config, isMultipleCell) =>
-						config.setItalic(
-							isMultipleCell // toggle if one cell but set bold if multiple cells
-								? true
-								: !config.textItalic
-						)
+					optionClick(
+						(config, isMultipleCell, majorityItalic) =>
+							config.setItalic(
+								isMultipleCell // toggle if one cell but set italic if multiple cells
+									? !majorityItalic
+									: !config.textItalic
+							),
+						(cells) => {
+							let nbItalic = 0;
+							cells.forEach((v) =>
+								v.forEach((cell) => {
+									if (
+										cell &&
+										cell.config &&
+										cell.config.textItalic
+									) {
+										nbItalic++;
+									}
+								})
+							);
+							return (
+								nbItalic / (cells.length * cells[0].length) >
+								0.5
+							);
+						}
 					)
 				}
 			>

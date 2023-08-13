@@ -10,6 +10,10 @@ interface RowProps extends TableProps {
 		selection: [number, number, number, number],
 		data: Partial<TableData>
 	) => void;
+	getCellElement: (
+		row: number,
+		col: number
+	) => HTMLTableCellElement | undefined;
 }
 const SSRow = ({
 	columns,
@@ -18,6 +22,7 @@ const SSRow = ({
 	tableData,
 	setTableData,
 	select,
+	getCellElement,
 }: RowProps) => {
 	const cell = (colIndex: number, style: React.CSSProperties | undefined) => (
 		<th
@@ -27,6 +32,7 @@ const SSRow = ({
 			onMouseUp={handleMouseUp}
 			onMouseEnter={() => handleMouseEnter(colIndex)}
 			onDoubleClick={() => handleDoubleClick(colIndex)}
+			onContextMenu={() => handleRightClick(colIndex)}
 		>
 			{dataManager.getCellText(colIndex, rowIndex)}
 		</th>
@@ -44,6 +50,7 @@ const SSRow = ({
 			onMouseDown={() => handleMouseDown(colIndex)}
 			onMouseUp={handleMouseUp}
 			onMouseEnter={() => handleMouseEnter(colIndex)}
+			onContextMenu={() => handleRightClick(colIndex)}
 			onBlur={(e) => {
 				dataManager.changeCell(
 					colIndex,
@@ -75,6 +82,15 @@ const SSRow = ({
 
 	function handleDoubleClick(colIndex: number) {
 		setTableData({ activeCell: [rowIndex, colIndex] });
+	}
+
+	function handleRightClick(colIndex: number) {
+		dataManager.openCellMenu(
+			rowIndex,
+			colIndex,
+			getCellElement(rowIndex, colIndex)
+		);
+		setTableData({ needUpdate: true });
 	}
 
 	function setOderSelection(colIndex: number) {

@@ -61,10 +61,12 @@ const SStable = ({ dataManager, tableData, setTableData }: TableProps) => {
 			) {
 				result += dataManager.getCellText(colIndex, rowIndex) + "\t";
 			}
+			result = result.slice(0, result.length - 1);
 			result += "\n";
 		}
 
-		navigator.clipboard.writeText(result);
+		console.log(result.slice(0, result.length - 1));
+		navigator.clipboard.writeText(result.slice(0, result.length - 1));
 	}
 
 	function deleteSelection() {
@@ -83,11 +85,13 @@ const SStable = ({ dataManager, tableData, setTableData }: TableProps) => {
 
 		for (let r = 0; r < subTable.length; r++) {
 			for (let c = 0; c < subTable[0].length; c++) {
-				dataManager.changeCell(
-					c + tableData.startSelection[1],
-					r + tableData.startSelection[0],
-					subTable[r][c]
-				);
+				if (subTable[r][c] !== "") {
+					dataManager.changeCell(
+						c + tableData.startSelection[1],
+						r + tableData.startSelection[0],
+						subTable[r][c]
+					);
+				}
 			}
 		}
 
@@ -257,6 +261,7 @@ const SStable = ({ dataManager, tableData, setTableData }: TableProps) => {
 									tableData={tableData}
 									setTableData={setTableData}
 									select={select}
+									getCellElement={getCellElement}
 								/>
 
 								<th key="add-col" className="add-col"></th>

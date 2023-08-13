@@ -2,6 +2,7 @@ import { SSView } from "src/view/SSView";
 import Cell from "../cell/Cell";
 import Column from "../cell/Column";
 import DefaultCell from "../cell/DefaultCell";
+import MenuCell from "../cell/MenuCell";
 import Row from "../cell/Row";
 import { fileParser, fileStringify, parserCell } from "../file/FileParser";
 import { createNewSheet } from "./SpreadSheetCreator";
@@ -14,6 +15,7 @@ export class DataManager {
 	currentSheet: number;
 
 	view: SSView;
+	menu = new MenuCell();
 
 	constructor(view: SSView) {
 		this.view = view;
@@ -50,6 +52,16 @@ export class DataManager {
 		this.view.reloadTable();
 	}
 
+	insertColumn(index: number) {
+		this.getSheet().table.forEach((row) => {
+			row.splice(index, 0, new DefaultCell());
+		});
+
+		if (this.getColumnsLenght() > this.getMaxColumnsLenght()) {
+			this.addMaxColumn();
+		}
+	}
+
 	private addRows(nbRow: number) {
 		for (let index = 0; index < nbRow; index++) {
 			this.getSheet().table.push(
@@ -58,6 +70,20 @@ export class DataManager {
 					() => new DefaultCell()
 				)
 			);
+		}
+	}
+
+	insertRow(index: number) {
+		this.getSheet().table.splice(
+			index,
+			0,
+			Array.from(
+				{ length: this.getColumnsLenght() },
+				() => new DefaultCell()
+			)
+		);
+		if (this.getRowsLenght() > this.getMaxRowsLenght()) {
+			this.addMaxRow();
 		}
 	}
 
@@ -91,14 +117,20 @@ export class DataManager {
 		this.data.sheets[index].name = name;
 	}
 
-	changeCell(column: number, row: number, value: string | null) {
+	changeCell(
+		column: number,
+		row: number,
+		value: string | null,
+		keepConfig = true
+	) {
 		const cell = this.getCell(column, row);
 
 		if (cell) {
+			const config = keepConfig ? cell.config : null;
 			this.data.sheets[this.currentSheet].table[row][column] =
 				value !== null && value !== ""
-					? parserCell(value, cell.config)
-					: new DefaultCell("", cell.config);
+					? parserCell(value, config)
+					: new DefaultCell("", config);
 			return;
 		}
 
@@ -115,6 +147,10 @@ export class DataManager {
 	}
 
 	updateTable(column: number, row: number) {
+		if (this.cellInRange(column, row)) {
+			return;
+		}
+
 		const difCol = column + 1 - this.getColumnsLenght();
 		if (difCol > 0) {
 			this.addColumns(difCol);
@@ -126,6 +162,23 @@ export class DataManager {
 		}
 
 		console.log(this.getSheet().table);
+	}
+
+	openCellMenu(
+		rowIndex: number,
+		colIndex: number,
+		cellElement: HTMLTableCellElement | undefined
+	) {
+		if (cellElement) {
+			const rect = cellElement.getBoundingClientRect();
+			this.menu.openMenu(
+				rect.x,
+				rect.y + rect.height,
+				rowIndex,
+				colIndex,
+				this
+			);
+		}
 	}
 
 	// ------------------------------------------------------------------------
@@ -185,6 +238,25 @@ export class DataManager {
 				callback(this.getCell(colIndex, rowIndex), rowIndex, colIndex);
 			}
 		}
+	}
+
+	getSelectionCells(selection: [number, number, number, number]) {
+		const cells: (Cell | undefined)[][] = [];
+		for (
+			let rowIndex = selection[0];
+			rowIndex <= selection[2];
+			rowIndex++
+		) {
+			const lastIndex = cells.push([]) - 1;
+			for (
+				let colIndex = selection[1];
+				colIndex <= selection[3];
+				colIndex++
+			) {
+				cells[lastIndex].push(this.getCell(colIndex, rowIndex));
+			}
+		}
+		return cells;
 	}
 
 	getColor(colorText: number): string {
