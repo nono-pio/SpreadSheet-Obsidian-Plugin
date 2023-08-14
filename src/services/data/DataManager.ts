@@ -103,6 +103,18 @@ export class DataManager {
 		return this.data.colors.push(color) - 1;
 	}
 
+	setProperty(name: string, value: string) {
+		this.data.properties.push(new Propertie(name, value));
+	}
+
+	setPropertyName(index: number, name: string) {
+		this.data.properties[index].name = name;
+	}
+
+	setPropertyValue(index: number, value: string) {
+		this.data.properties[index].value = value;
+	}
+
 	// ------------------------------------------------------------------------
 
 	changeSheet(index: number) {
@@ -179,6 +191,10 @@ export class DataManager {
 				this
 			);
 		}
+	}
+
+	deleteProp(index: number) {
+		this.data.properties.splice(index, 1);
 	}
 
 	// ------------------------------------------------------------------------

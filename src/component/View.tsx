@@ -1,6 +1,7 @@
 import * as React from "react";
 import { DataManager } from "../services/data/DataManager";
 import Options from "./Options";
+import Properties from "./Properties";
 import SSTable from "./SSTable";
 import Sheets from "./Sheets";
 import useTableData from "./hooks/useTableData";
@@ -22,6 +23,11 @@ const View = ({ dataManager }: ViewProps) => {
 	return (
 		<React.StrictMode>
 			<Options
+				dataManager={dataManager}
+				tableData={tableData}
+				setTableData={setTableData}
+			/>
+			<Properties
 				dataManager={dataManager}
 				tableData={tableData}
 				setTableData={setTableData}
