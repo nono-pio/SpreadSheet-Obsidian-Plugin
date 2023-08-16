@@ -25,7 +25,7 @@ export class DataManager {
 	// set/get Data
 	setData(data: string) {
 		this.currentSheet = 0;
-		this.data = fileParser(data);
+		this.data = fileParser(data, this);
 	}
 
 	getDataJSON() {
@@ -141,7 +141,7 @@ export class DataManager {
 			const config = keepConfig ? cell.config : null;
 			this.data.sheets[this.currentSheet].table[row][column] =
 				value !== null && value !== ""
-					? parserCell(value, config)
+					? parserCell(value, config, this)
 					: new DefaultCell("", config);
 			return;
 		}
@@ -154,7 +154,8 @@ export class DataManager {
 
 		this.data.sheets[this.currentSheet].table[row][column] = parserCell(
 			value,
-			null
+			null,
+			this
 		);
 	}
 
@@ -204,6 +205,15 @@ export class DataManager {
 	}
 
 	// ------------------------------------------------------------------------
+
+	getPropValue(prop: string): string | undefined {
+		for (const _prop of this.data.properties) {
+			if (_prop.name === prop) {
+				return _prop.value;
+			}
+		}
+		return undefined;
+	}
 
 	getCellText(column: number, row: number): string {
 		if (this.cellInRange(column, row)) {

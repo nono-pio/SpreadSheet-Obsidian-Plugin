@@ -65,7 +65,6 @@ const SStable = ({ dataManager, tableData, setTableData }: TableProps) => {
 			result += "\n";
 		}
 
-		console.log(result.slice(0, result.length - 1));
 		navigator.clipboard.writeText(result.slice(0, result.length - 1));
 	}
 
@@ -98,69 +97,105 @@ const SStable = ({ dataManager, tableData, setTableData }: TableProps) => {
 		setTableData({ needUpdate: true });
 	}
 
-	function keyDownEvent(key: string, keyCtrl: boolean) {
-		switch (key) {
+	function keyDownEvent(e: React.KeyboardEvent<HTMLTableElement>) {
+		const isModeSelection = tableData.activeCell.every((v) => v === -1);
+		switch (e.key) {
 			case "c":
-				copy();
+				if (e.ctrlKey && isModeSelection) {
+					copy();
+				}
 				break;
 			case "v":
-				paste();
+				if (e.ctrlKey && isModeSelection) {
+					paste();
+				}
 				break;
 			case "x":
-				copy();
-				deleteSelection();
+				if (e.ctrlKey && isModeSelection) {
+					copy();
+					deleteSelection();
+				}
 				break;
 			case "Delete" || "Backslash":
-				deleteSelection();
+				if (isModeSelection) {
+					deleteSelection();
+				}
 				break;
 			case "ArrowUp": {
-				const startSelection: [number, number] = [
-					Math.max(tableData.startSelection[0] - 1, 0),
-					tableData.startSelection[1],
-				];
-				select([...startSelection, ...startSelection], {
-					mousePress: false,
-					startSelection: startSelection,
-				});
+				if (isModeSelection) {
+					const startSelection: [number, number] = [
+						Math.max(tableData.startSelection[0] - 1, 0),
+						tableData.startSelection[1],
+					];
+					select([...startSelection, ...startSelection], {
+						mousePress: false,
+						startSelection: startSelection,
+					});
+					e.preventDefault();
+				}
 				break;
 			}
 			case "ArrowDown": {
-				const startSelection: [number, number] = [
-					Math.min(tableData.startSelection[0] + 1, rows.length - 1),
-					tableData.startSelection[1],
-				];
-				select([...startSelection, ...startSelection], {
-					mousePress: false,
-					startSelection: startSelection,
-				});
+				if (isModeSelection) {
+					const startSelection: [number, number] = [
+						Math.min(
+							tableData.startSelection[0] + 1,
+							rows.length - 1
+						),
+						tableData.startSelection[1],
+					];
+					select([...startSelection, ...startSelection], {
+						mousePress: false,
+						startSelection: startSelection,
+					});
+					e.preventDefault();
+				}
 				break;
 			}
 			case "ArrowLeft": {
-				const startSelection: [number, number] = [
-					tableData.startSelection[0],
-					Math.max(tableData.startSelection[1] - 1, 0),
-				];
-				select([...startSelection, ...startSelection], {
-					mousePress: false,
-					startSelection: startSelection,
-				});
+				if (isModeSelection) {
+					const startSelection: [number, number] = [
+						tableData.startSelection[0],
+						Math.max(tableData.startSelection[1] - 1, 0),
+					];
+					select([...startSelection, ...startSelection], {
+						mousePress: false,
+						startSelection: startSelection,
+					});
+					e.preventDefault();
+				}
 				break;
 			}
 			case "ArrowRight": {
-				const startSelection: [number, number] = [
-					tableData.startSelection[0],
-					Math.min(
-						tableData.startSelection[1] + 1,
-						columns.length - 1
-					),
-				];
-				select([...startSelection, ...startSelection], {
-					mousePress: false,
-					startSelection: startSelection,
-				});
+				if (isModeSelection) {
+					const startSelection: [number, number] = [
+						tableData.startSelection[0],
+						Math.min(
+							tableData.startSelection[1] + 1,
+							columns.length - 1
+						),
+					];
+					select([...startSelection, ...startSelection], {
+						mousePress: false,
+						startSelection: startSelection,
+					});
+					e.preventDefault();
+				}
 				break;
 			}
 			case "Enter": {
+				if (!tableData.activeCell.every((v) => v === -1)) {
+					// if has active cell
+					const text = getCellElement(
+						...tableData.activeCell
+					)?.textContent;
+
+					dataManager.changeCell(
+						tableData.activeCell[1],
+						tableData.activeCell[0],
+						text ? text : ""
+					);
+				}
 				const startSelection: [number, number] = [
 					Math.min(tableData.startSelection[0] + 1, rows.length - 1),
 					tableData.startSelection[1],
@@ -170,6 +205,7 @@ const SStable = ({ dataManager, tableData, setTableData }: TableProps) => {
 					startSelection: startSelection,
 					activeCell: [-1, -1],
 				});
+				e.preventDefault();
 				break;
 			}
 		}
@@ -182,7 +218,7 @@ const SStable = ({ dataManager, tableData, setTableData }: TableProps) => {
 				<table
 					className="ss-table"
 					ref={tableRef}
-					onKeyDown={(e) => keyDownEvent(e.key, e.ctrlKey)}
+					onKeyDown={keyDownEvent}
 					tabIndex={0}
 				>
 					<thead>

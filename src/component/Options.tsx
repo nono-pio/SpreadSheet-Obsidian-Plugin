@@ -6,10 +6,12 @@ import { TableProps } from "./SSTable";
 const style = getComputedStyle(document.body);
 const colorBase100 = style.getPropertyValue("--color-base-100").substring(1);
 const colorBase00 = style.getPropertyValue("--color-base-00").substring(1);
+const defaultTextSize = parseInt(style.getPropertyValue("--table-header-size"));
 
 const Options = ({ dataManager, tableData, setTableData }: TableProps) => {
 	const colorTextRef = React.useRef<HTMLInputElement>(null);
 	const colorBgRef = React.useRef<HTMLInputElement>(null);
+	const textSizeRef = React.useRef<HTMLInputElement>(null);
 
 	function optionClick(
 		changeConfig: (
@@ -123,7 +125,7 @@ const Options = ({ dataManager, tableData, setTableData }: TableProps) => {
 					></path>
 				</svg>
 			</button>
-			<div className="seperator"></div>
+			<div className="seperator" />
 			<button
 				onClick={() =>
 					optionClick((config) =>
@@ -166,7 +168,7 @@ const Options = ({ dataManager, tableData, setTableData }: TableProps) => {
 					></path>
 				</svg>
 			</button>
-			<div className="seperator"></div>
+			<div className="seperator" />
 			<button
 				onClick={() =>
 					optionClick((config) =>
@@ -174,7 +176,7 @@ const Options = ({ dataManager, tableData, setTableData }: TableProps) => {
 							dataManager.addColor(
 								colorTextRef.current
 									? colorTextRef.current.value
-									: "#FF0000"
+									: colorBase100
 							)
 						)
 					)
@@ -199,7 +201,7 @@ const Options = ({ dataManager, tableData, setTableData }: TableProps) => {
 							dataManager.addColor(
 								colorBgRef.current
 									? colorBgRef.current.value
-									: "#FF0000"
+									: colorBase00
 							)
 						)
 					)
@@ -215,6 +217,31 @@ const Options = ({ dataManager, tableData, setTableData }: TableProps) => {
 					type="color"
 					ref={colorBgRef}
 					defaultValue={colorBase00}
+				/>
+			</button>
+			<div className="seperator" />
+			<button
+				onClick={() =>
+					optionClick((config) =>
+						config.setTextSize(
+							textSizeRef.current?.valueAsNumber
+								? textSizeRef.current.valueAsNumber
+								: defaultTextSize
+						)
+					)
+				}
+			>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					fill="currentColor"
+					viewBox="0 0 24 24"
+				>
+					<path d="M2,21H6a1,1,0,0,0,0-2H5.376l1.951-6h5.346l1.95,6H14a1,1,0,0,0,0,2h4a1,1,0,0,0,0-2H16.727L11.751,3.69A1,1,0,0,0,10.8,3H9.2a1,1,0,0,0-.951.69L3.273,19H2a1,1,0,0,0,0,2ZM9.927,5h.146l1.95,6H7.977ZM23,16a1,1,0,0,1-1,1H19a1,1,0,0,1,0-2h.365l-.586-1.692H17a1,1,0,0,1,0-2h1.087L17.288,9h-.576l-.113.327a1,1,0,0,1-1.891-.654l.346-1A1,1,0,0,1,16,7h2a1,1,0,0,1,.945.673L21.481,15H22A1,1,0,0,1,23,16Z" />
+				</svg>
+				<input
+					type="number"
+					ref={textSizeRef}
+					defaultValue={defaultTextSize}
 				/>
 			</button>
 		</div>

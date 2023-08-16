@@ -10,6 +10,8 @@ export default class CellConfig {
 	textBold = false;
 	textItalic = false;
 
+	textSize = -1;
+
 	setAlignement(align: Alignment) {
 		this.alignment = align;
 		return this;
@@ -35,6 +37,11 @@ export default class CellConfig {
 		return this;
 	}
 
+	setTextSize(size: number) {
+		this.textSize = size;
+		return this;
+	}
+
 	generateStyle(dataManager: DataManager): React.CSSProperties {
 		return {
 			fontWeight: this.textBold ? "bold" : "normal",
@@ -48,6 +55,7 @@ export default class CellConfig {
 				this.colorBackground !== null
 					? dataManager.getColor(this.colorBackground)
 					: "inherit",
+			fontSize: this.textSize === -1 ? undefined : this.textSize,
 		};
 	}
 
@@ -93,6 +101,12 @@ export default class CellConfig {
 
 		if (this.textBold) {
 			result += "$g";
+		}
+
+		if (this.textSize !== -1) {
+			result +=
+				"$s" +
+				(this.textSize < 10 ? "0" + this.textSize : this.textSize);
 		}
 
 		return result;

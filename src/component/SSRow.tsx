@@ -45,6 +45,7 @@ const SSRow = ({
 		<th
 			key={colIndex}
 			style={style}
+			className="active-cell"
 			contentEditable
 			suppressContentEditableWarning
 			onMouseDown={() => handleMouseDown(colIndex)}

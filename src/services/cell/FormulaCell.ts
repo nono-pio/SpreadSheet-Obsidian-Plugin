@@ -1,38 +1,30 @@
-import Formula from "../formula/Formula";
+import { Node } from "../formula/FormulaParser";
 import Cell from "./Cell";
 import CellConfig from "./CellConfig";
 
 export default class FormulaCell extends Cell {
-	formulaString: string;
-	formula: Formula<unknown>;
-	result: unknown | null = null;
+	formula: string;
+	node: Node;
+	result: string | undefined = undefined;
 
-	constructor(
-		formula: Formula<unknown>,
-		formulaString: string,
-		config: CellConfig | null
-	) {
+	constructor(formula: string, node: Node, config: CellConfig | null) {
 		super(config);
 		this.formula = formula;
-		this.formulaString = formulaString;
+		this.node = node;
 	}
 
 	getCellText(): string {
-		if (this.result === null) {
-			this.result = this.makeFormula();
+		if (!this.result) {
+			this.result = this.node.getString();
 		}
-		return "" + this.result;
+		return this.result;
 	}
 
 	getCellTextEnter(): string {
-		return this.formulaString;
-	}
-
-	makeFormula(): unknown {
-		return this.formula.GetValue();
+		return this.formula;
 	}
 
 	getData(): string {
-		return this.formulaString;
+		return this.formula;
 	}
 }
