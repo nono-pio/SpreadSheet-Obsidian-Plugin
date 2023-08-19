@@ -1,48 +1,42 @@
 import * as React from "react";
+import { CellPos } from "src/services/cell/Cell";
 import { DataManager } from "../services/data/DataManager";
-import Options from "./Options";
-import Properties from "./Properties";
-import SSTable from "./SSTable";
+import Option from "./Option";
+import Selection from "./Selection";
 import Sheets from "./Sheets";
-import useTableData from "./hooks/useTableData";
+import Table from "./Table";
+import useSheetsData from "./hooks/useSheetsData";
+import useTable from "./hooks/useTable";
 
-export function getViewComp(props: ViewProps) {
-	return <View {...props} />;
+export function getViewComp(dataManager: DataManager) {
+	return <View dataManager={dataManager} />;
 }
 
-export interface ViewProps {
-	dataManager: DataManager;
-}
+const View: React.FC<{ dataManager: DataManager }> = ({ dataManager }) => {
+	const tableRef = React.useRef<HTMLTableElement>(null);
+	const sheetsData = useSheetsData(dataManager);
+	const tableData = useTable(sheetsData.currentSheet);
 
-const View = ({ dataManager }: ViewProps) => {
-	const [tableData, setTableData] = useTableData();
-	if (tableData.needUpdate) {
-		setTableData({ needUpdate: false });
+	function getCellElement(cellPos: CellPos) {
+		return tableRef.current?.rows[cellPos[1]].cells[cellPos[0]];
 	}
 
+	console.log("Render View");
+
+	// React.strictMode
 	return (
-		<React.StrictMode>
-			<Options
-				dataManager={dataManager}
-				tableData={tableData}
-				setTableData={setTableData}
-			/>
-			<Properties
-				dataManager={dataManager}
-				tableData={tableData}
-				setTableData={setTableData}
-			/>
-			<SSTable
-				dataManager={dataManager}
-				tableData={tableData}
-				setTableData={setTableData}
-			/>
-			<Sheets
-				dataManager={dataManager}
-				tableData={tableData}
-				setTableData={setTableData}
-			/>
-		</React.StrictMode>
+		<div className="spreadsheet">
+			<Option tableData={tableData} />
+			<div className="table">
+				<Table
+					tableRef={tableRef}
+					sheet={sheetsData.currentSheet}
+					tableData={tableData}
+				/>
+				<Sheets sheetsData={sheetsData} />
+				<Selection getCellElement={getCellElement} />
+			</div>
+		</div>
 	);
 };
 

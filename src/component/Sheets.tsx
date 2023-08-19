@@ -1,45 +1,36 @@
 import * as React from "react";
-import { TableProps } from "./SSTable";
+import { SheetsData } from "./hooks/useSheetsData";
 
-const Sheets = ({ dataManager, tableData, setTableData }: TableProps) => {
+const Sheets: React.FC<{ sheetsData: SheetsData }> = ({ sheetsData }) => {
 	return (
 		<div className="sheets">
-			<ul>
-				{dataManager.getSheets().map((sheet, index) => (
-					<li
-						key={index}
-						onClick={() => dataManager.changeSheet(index)}
-						className={`${
-							dataManager.currentSheet === index
-								? "sheet-active"
-								: ""
-						}`}
-						onMouseEnter={(e) =>
-							e.currentTarget.addClass("sheet-hover")
-						}
-						onMouseOut={(e) =>
-							e.currentTarget.removeClass("sheet-hover")
-						}
-						contentEditable
-						suppressContentEditableWarning
-						onBlur={(e) =>
-							dataManager.changeSheetName(
-								index,
-								e.target.getText()
-							)
-						}
-					>
-						{sheet.name}
-					</li>
-				))}
-			</ul>
-			<button
-				onClick={() => {
-					dataManager.addSheet();
-				}}
-			>
-				Add Sheet
-			</button>
+			{sheetsData.sheets.map((sheet, index) => (
+				<button
+					key={index}
+					className={
+						index === sheetsData.currentSheetIndex
+							? "active sheet-btn"
+							: "sheet-btn"
+					}
+					onBlur={(e) =>
+						sheetsData.renameSheet(
+							index,
+							e.target.textContent
+								? e.target.textContent
+								: "error"
+						)
+					}
+					onClick={() => {
+						if (index !== sheetsData.currentSheetIndex)
+							sheetsData.changeSheet(index);
+					}}
+					contentEditable
+					suppressContentEditableWarning
+				>
+					{sheet.name}
+				</button>
+			))}
+			<button onClick={() => sheetsData.addSheet()}>Add Sheet</button>
 		</div>
 	);
 };

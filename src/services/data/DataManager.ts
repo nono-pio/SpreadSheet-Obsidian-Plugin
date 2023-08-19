@@ -37,6 +37,7 @@ export class DataManager {
 	addSheet() {
 		const newLenght = this.data.sheets.push(createNewSheet("untited"));
 		this.changeSheet(newLenght - 1);
+		return newLenght - 1;
 	}
 
 	private addColumns(nbCol: number) {

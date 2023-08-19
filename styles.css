@@ -1,3 +1,141 @@
+/* V2 */
+
+.spreadsheet {
+	height: inherit; /*100% of view*/
+	display: flex; /* option (fix) & table (rest) */
+	flex-direction: column;
+}
+
+.spreadsheet .option {
+	display: flex;
+	justify-content: center;
+	flex-wrap: wrap;
+	gap: 5px;
+
+	padding: 10px 0;
+
+	& .seperator {
+		margin: 0 5px 0 5px;
+		border-left: 2px solid var(--color-base-30);
+	}
+
+	& .option-item {
+		display: flex;
+		align-items: center;
+		gap: 5px;
+
+		& button {
+			height: auto;
+
+			& svg {
+				height: 24px;
+			}
+		}
+
+		/*& input {
+
+		}*/
+	}
+}
+
+.spreadsheet .table {
+	position: relative; /*for sheets pos*/
+	flex-grow: 1; /*fill screen*/
+	overflow: auto;
+}
+
+.spreadsheet .table .sheets {
+	position: fixed;
+
+	padding: 25px 35px;
+	left: 30px;
+	bottom: 30px;
+
+	border-radius: 20px;
+	background-color: rgba(10, 10, 10, 0.4);
+
+	> .sheet-btn {
+		margin-right: 7.5px;
+	}
+
+	> .sheet-btn.active {
+		background-color: var(--color-accent);
+	}
+}
+
+.spreadsheet .table table {
+	border-collapse: collapse;
+
+	/*All cell header or not*/
+	& th,
+	& td {
+		padding: var(--size-2-2) var(--size-4-2);
+
+		font-size: var(--table-header-size);
+		font-weight: var(--table-header-weight);
+		font-weight: normal;
+
+		color: var(--color-base-100);
+		font-family: var(--table-header-font);
+		line-height: var(--line-height-tight);
+
+		border: var(--table-border-width) solid var(--table-border-color);
+	}
+
+	/*All header cells (row & col)*/
+	& th {
+		min-width: 75px;
+		min-height: 37.5px;
+	}
+
+	/*First cell*/
+	& thead th:first-child {
+		border-left: none;
+		left: 0;
+		z-index: 2;
+	}
+
+	/*All columns*/
+	& thead {
+		& th {
+			border-top: none;
+			position: sticky;
+			top: 0;
+			background-color: var(--color-base-10);
+		}
+
+		& .column-active {
+			box-shadow: inset 0 -12px 10px -10px var(--color-accent);
+			transition: box-shadow 0.3s ease-in-out;
+		}
+	}
+
+	/*All rows*/
+	& tbody th {
+		position: sticky;
+		left: 0;
+		background-color: var(--color-base-10);
+		border-left: none;
+
+		& .row-active {
+			box-shadow: inset -12px 0 10px -10px var(--color-accent);
+			transition: box-shadow 0.3s ease-in-out;
+		}
+	}
+
+	& .add-icon {
+		width: 24px;
+		height: 24px;
+	}
+
+	/*Add of last row*/
+	& tfoot th {
+		border-left: none;
+	}
+}
+
+/* V1 */
+
 .icon-add-columns {
 	stroke: var(--icon-color);
 	aspect-ratio: 1/1;
@@ -65,144 +203,6 @@
 	height: 24px;
 }
 
-/* Option */
-.options {
-	position: absolute;
-
-	right: calc(25% + 12px);
-	left: 0;
-	height: 75px;
-
-	z-index: 1;
-
-	background-color: var(--background-primary-alt);
-	border-bottom: 1px solid var(--table-border-color);
-
-	display: flex;
-	flex-direction: row;
-	flex-wrap: wrap;
-	justify-content: center;
-	gap: 5px;
-	align-content: center;
-}
-
-.options button {
-	margin: 0;
-	height: 30pt;
-	background-color: var(--interactive-normal);
-	color: var(--icon-color);
-	box-shadow: var(--input-shadow);
-}
-
-.options button svg {
-	height: 24px;
-}
-
-.options button input {
-	margin-left: 5px;
-}
-
-.options button:hover {
-	background-color: var(--interactive-hover);
-	box-shadow: var(--input-shadow-hover);
-}
-
-.options .seperator {
-	border-left: 2px solid var(--color-base-30);
-	margin: 0 5px 0 5px;
-}
-
-/* Top of the table */
-.top-table {
-	height: 75px;
-}
-
-/* Table */
-.ss-table {
-	overflow: auto;
-	border-collapse: collapse;
-}
-
-/* All Cell */
-.ss-table th {
-	min-width: 75px;
-	min-height: 35px;
-	padding: var(--size-2-2) var(--size-4-2);
-
-	font-size: var(--table-header-size);
-	font-weight: var(--table-header-weight);
-	font-weight: normal;
-
-	color: var(--color-base-100);
-	font-family: var(--table-header-font);
-	text-align: left;
-	line-height: var(--line-height-tight);
-
-	border: var(--table-border-width) solid var(--table-border-color);
-}
-
-/* Active Cell */
-.ss-table tbody .active-cell {
-	position: relative;
-}
-
-.ss-table tbody .active-cell > div {
-	position: absolute;
-	background-color: red;
-
-	z-index: 2;
-	top: -100px;
-	left: 5px;
-
-	width: 100px;
-	height: 100px;
-
-	& div {
-	}
-}
-
-/* Cell in line of active cell */
-.ss-table tbody .cell-line {
-	background-color: var(--color-base-05);
-}
-
-/* Column Cell */
-.ss-table thead th {
-	top: 75px;
-	position: sticky;
-
-	background-color: var(--color-base-10);
-	border-top: none;
-}
-
-/* Active Column Cell */
-.ss-table thead .column-active {
-	/*background-color: var(--color-base-20);*/
-	box-shadow: inset 0 -12px 10px -10px var(--color-accent);
-	transition: box-shadow 0.3s ease-in-out;
-}
-
-/* Row Cell */
-.ss-table th:first-child {
-	left: 0;
-	position: sticky;
-
-	background-color: var(--color-base-10);
-	border-left: none;
-}
-
-/* Active Row Cell */
-.ss-table tbody tr th.row-active {
-	/*background-color: var(--color-base-20) !important;*/
-	box-shadow: inset -12px 0 10px -10px var(--color-accent);
-	transition: box-shadow 0.3s ease-in-out;
-}
-
-/* First Cell */
-table.ss-table .empty-case {
-	z-index: 3;
-}
-
 /* Selection cells */
 .selection {
 	position: absolute;
@@ -212,7 +212,7 @@ table.ss-table .empty-case {
 }
 
 /* Sheets Menu */
-.sheets {
+/*.sheets {
 	background-color: var(--color-base-20);
 
 	bottom: 12px;
@@ -237,9 +237,9 @@ table.ss-table .empty-case {
 
 	gap: 10px;
 }
-
+*/
 /* All Sheet */
-.sheets > ul > li {
+/*.sheets > ul > li {
 	padding: var(--size-4-1) var(--size-4-3);
 	height: var(--input-height);
 
@@ -272,6 +272,7 @@ table.ss-table .empty-case {
 .sheet-active {
 	border: 1px solid blue !important;
 }
+*/
 
 /**/
 .view-content {

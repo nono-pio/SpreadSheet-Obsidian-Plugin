@@ -17,6 +17,7 @@
 	"include": [
 		"**/*.ts",
 		"src/view/SSView.ts",
-		"src/component/hooks/useTableData.tsx"
+		"src/component/hooks/useTableData.ts",
+		"src/component/context/TableContext.tsx"
 	]
 }

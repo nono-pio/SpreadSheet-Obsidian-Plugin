@@ -3,8 +3,8 @@ import DefaultCell from "../cell/DefaultCell";
 import Row from "../cell/Row";
 import { SSData, Sheet } from "./DataManager";
 
-const COL_LENGHT = 10;
-const ROW_LENGHT = 15;
+const COL_LENGHT = 30;
+const ROW_LENGHT = 25;
 
 export function createNewSS(
 	firstSheetName: string,

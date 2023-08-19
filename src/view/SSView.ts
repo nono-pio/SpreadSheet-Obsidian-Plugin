@@ -9,7 +9,6 @@ export const VIEW_TYPE_SS_PLUGIN = "obsidian-plugin-spreadsheet";
 export class SSView extends TextFileView {
 	settings: MyPluginSettings;
 	rootContainer: Root;
-	tableContainer: HTMLDivElement;
 	dataManager: DataManager;
 
 	constructor(leaf: WorkspaceLeaf, settings: MyPluginSettings) {
@@ -22,22 +21,18 @@ export class SSView extends TextFileView {
 	}
 
 	initRootContainer() {
-		this.tableContainer = this.contentEl.createDiv();
-		this.tableContainer.addClass("ss-container");
-		this.rootContainer = createRoot(this.tableContainer);
+		this.rootContainer = createRoot(this.contentEl);
 	}
 
 	// remake the table
 	reloadTable() {
 		this.rootContainer.unmount();
-		this.rootContainer = createRoot(this.tableContainer);
+		this.rootContainer = createRoot(this.contentEl);
 		this.buildView();
 	}
 
 	buildView() {
-		this.rootContainer.render(
-			getViewComp({ dataManager: this.dataManager })
-		);
+		this.rootContainer.render(getViewComp(this.dataManager));
 	}
 
 	getViewData(): string {

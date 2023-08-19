@@ -13,3 +13,5 @@ export default abstract class Cell {
 
 	abstract getData(): string;
 }
+
+export type CellPos = [column: number, row: number];
