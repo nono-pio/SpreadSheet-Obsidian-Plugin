@@ -1,9 +1,9 @@
 import * as React from "react";
 import { Sheet } from "src/services/data/DataManager";
-import CellUI from "./CellUI";
+import CellsRow from "./CellsRow";
 import Columns from "./Columns";
 import RowUI from "./RowUI";
-import useSelection from "./hooks/useSelection";
+import { SelectionData } from "./hooks/useSelection";
 import { TableData } from "./hooks/useTable";
 import Add from "./icon/Add";
 
@@ -11,33 +11,12 @@ const Table: React.FC<{
 	tableRef: React.LegacyRef<HTMLTableElement>;
 	sheet: Sheet;
 	tableData: TableData;
-}> = ({ tableRef, sheet, tableData }) => {
+	selectionData: SelectionData;
+}> = ({ tableRef, sheet, tableData, selectionData }) => {
 	console.log("Render Table");
 
 	const columns = sheet.columns;
 	const rows = sheet.rows;
-
-	const selectionData = useSelection();
-
-	function onMouseDown(column: number, row: number) {
-		// start selection
-		selectionData.startNewSelection([column, row]);
-	}
-	function onMouseUp(column: number, row: number) {
-		// end selection
-		selectionData.endSelection([column, row]);
-	}
-	function onMouseEnter(column: number, row: number) {
-		// update selection
-		selectionData.updateSelection([column, row]);
-	}
-	function onContextMenu(column: number, row: number) {
-		// set context menu
-	}
-	function onBlur(column: number, row: number, value: string | null) {
-		// update cell
-		tableData.updateCell([column, row], value ? value : "");
-	}
 
 	return (
 		<table ref={tableRef}>
@@ -65,18 +44,12 @@ const Table: React.FC<{
 							columnLenght={columns.length}
 							setSelection={selectionData.setSelection}
 						/>
-						{sheet.columns.map((_, ci) => (
-							<CellUI
-								rowIndex={ri}
-								columnIndex={ci}
-								key={ci}
-								onBlur={onBlur}
-								onContextMenu={onContextMenu}
-								onMouseDown={onMouseDown}
-								onMouseEnter={onMouseEnter}
-								onMouseUp={onMouseUp}
-							/>
-						))}
+						<CellsRow
+							columns={sheet.columns}
+							row={ri}
+							selectionData={selectionData}
+							tableData={tableData}
+						/>
 						<td></td>
 					</tr>
 				))}

@@ -1,14 +1,13 @@
 import { useState } from "react";
 import { CellPos } from "src/services/cell/Cell";
 
-const useSelection = () => {
-	const [selection, setSelection] = useState<Selection>(undefined);
+const useSelection: () => SelectionData = () => {
+	const [selection, setSelection] = useState<Selection>([
+		[0, 0], //topLeft
+		[0, 0], //bottomRight
+	]);
 	const [startSelection, setStartSelection] = useState<CellPos>([0, 0]);
 	const [onSelectionMode, setSelectionMode] = useState<boolean>(false); // is selection cells mode
-
-	function validPos(pos: CellPos) {
-		return pos[0] !== -1 && pos[1] !== -1;
-	}
 
 	const startNewSelection = (pos: CellPos) => {
 		setSelectionMode(true);
@@ -23,7 +22,7 @@ const useSelection = () => {
 	};
 
 	const updateSelection = (pos: CellPos) => {
-		setAndOrderSelection(startSelection, pos);
+		setAndOrderSelection([...startSelection], pos);
 	};
 
 	const setAndOrderSelection: SetSelection = (
@@ -58,8 +57,6 @@ const useSelection = () => {
 		selection,
 		startSelection,
 		onSelectionMode,
-		hasStartSelection: validPos(startSelection),
-		hasSelection: selection ? true : false,
 		setSelection: setAndOrderSelection,
 		updateSelection,
 		startNewSelection,
@@ -69,9 +66,19 @@ const useSelection = () => {
 
 export default useSelection;
 
-export type Selection = [topLeft: CellPos, bottomRight: CellPos] | undefined;
+export type Selection = [topLeft: CellPos, bottomRight: CellPos];
 export type SetSelection = (
 	posStart: CellPos,
 	posEnd: CellPos,
 	isStart?: boolean
 ) => void;
+
+export interface SelectionData {
+	selection: Selection;
+	startSelection: CellPos;
+	onSelectionMode: boolean;
+	setSelection: SetSelection;
+	updateSelection: (pos: CellPos) => void;
+	startNewSelection: (pos: CellPos) => void;
+	endSelection: (pos: CellPos) => void;
+}

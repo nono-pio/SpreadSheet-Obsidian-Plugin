@@ -4,12 +4,12 @@ import Column from "../cell/Column";
 import DefaultCell from "../cell/DefaultCell";
 import FormulaCell from "../cell/FormulaCell";
 import Row from "../cell/Row";
-import { DataManager, Propertie, SSData, Sheet } from "../data/DataManager";
+import { Propertie, SSData, Sheet } from "../data/DataManager";
 import parseFormula from "../formula/FormulaParser";
 
 // -----------------------------------------------------------------------------------------
 
-export function fileParser(data: string, dataManager: DataManager): SSData {
+export function fileParser(data: string): SSData {
 	const file: PSSData = JSON.parse(data);
 
 	const properties = Array.from(
@@ -21,7 +21,7 @@ export function fileParser(data: string, dataManager: DataManager): SSData {
 	);
 
 	const sheets = Array.from({ length: file.sheets.length }, (_, k) =>
-		parseSheet(file.sheets[k], dataManager)
+		parseSheet(file.sheets[k])
 	);
 
 	return new SSData(sheets, properties, file.colors);
@@ -35,11 +35,9 @@ export function csv2D(data: string): string[][] {
 	return data.split("\n").map((v) => v.split(","));
 }
 
-function parseSheet(sheet: PSheet, dataManager: DataManager): Sheet {
+function parseSheet(sheet: PSheet): Sheet {
 	const tableSTR = csv2D(sheet.table);
-	const table = tableSTR.map((v) =>
-		v.map((k) => csvParserCell(k, dataManager))
-	);
+	const table = tableSTR.map((v) => v.map((k) => csvParserCell(k)));
 
 	const columnSTR = csv1D(sheet.columns);
 	const columns = Array.from(
@@ -54,16 +52,9 @@ function parseSheet(sheet: PSheet, dataManager: DataManager): Sheet {
 }
 
 // modification cell
-export function parserCell(
-	value: string,
-	config: CellConfig | null,
-	dataManager: DataManager
-): Cell {
+export function parserCell(value: string, config: CellConfig | null): Cell {
 	if (value.startsWith("=")) {
-		const formula = parseFormula(
-			value.substring(1, value.length),
-			dataManager
-		);
+		const formula = parseFormula(value.substring(1, value.length));
 		return new FormulaCell(value, formula, config);
 	} else {
 		return new DefaultCell(value, config);
@@ -71,7 +62,7 @@ export function parserCell(
 }
 
 // creation of the cell
-export function csvParserCell(value: string, dataManager: DataManager): Cell {
+export function csvParserCell(value: string): Cell {
 	let config: null | CellConfig = null;
 
 	while (value.startsWith("$")) {
@@ -100,7 +91,7 @@ export function csvParserCell(value: string, dataManager: DataManager): Cell {
 		.replace("$_", "$");
 
 	try {
-		return parserCell(finalValue, config, dataManager);
+		return parserCell(finalValue, config);
 	} catch (error) {
 		return new DefaultCell(finalValue, config);
 	}

@@ -1,20 +1,21 @@
 import { TextFileView, WorkspaceLeaf } from "obsidian";
 import { Root, createRoot } from "react-dom/client";
 import { MyPluginSettings } from "src/main";
+import CellManager from "src/services/cell/CellManager";
+import { fileParser, fileStringify } from "src/services/file/FileParser";
 import { getViewComp } from "../component/View";
-import { DataManager } from "../services/data/DataManager";
+import { SSData } from "../services/data/DataManager";
 
 export const VIEW_TYPE_SS_PLUGIN = "obsidian-plugin-spreadsheet";
 
 export class SSView extends TextFileView {
 	settings: MyPluginSettings;
 	rootContainer: Root;
-	dataManager: DataManager;
+	spreadSheetData: SSData;
 
 	constructor(leaf: WorkspaceLeaf, settings: MyPluginSettings) {
 		super(leaf);
 		this.settings = settings;
-		this.dataManager = new DataManager(this);
 
 		// create root and table container
 		this.initRootContainer();
@@ -28,21 +29,19 @@ export class SSView extends TextFileView {
 	reloadTable() {
 		this.rootContainer.unmount();
 		this.rootContainer = createRoot(this.contentEl);
-		this.buildView();
+		this.rootContainer.render(getViewComp(this.spreadSheetData));
 	}
 
-	buildView() {
-		this.rootContainer.render(getViewComp(this.dataManager));
-	}
-
+	// unload view
 	getViewData(): string {
-		const json = this.dataManager.getDataJSON();
-		return json;
+		return fileStringify(this.spreadSheetData); // data to json
 	}
 
+	// load view with data
 	setViewData(data: string): void {
-		this.dataManager.setData(data);
-		this.reloadTable();
+		this.spreadSheetData = fileParser(data); // json to data
+		CellManager.Instanciate(this.spreadSheetData); // instanciate the linker of formula
+		this.reloadTable(); // reload table with new data
 	}
 
 	clear(): void {}

@@ -2,7 +2,7 @@ import * as React from "react";
 
 const Add = () => {
 	return (
-		<div className="clickable-icon">
+		<div className="clickable-icon" style={{ padding: 0 }}>
 			<svg
 				className="add-icon"
 				viewBox="0 0 24 24"

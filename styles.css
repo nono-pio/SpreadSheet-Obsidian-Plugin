@@ -44,6 +44,13 @@
 	overflow: auto;
 }
 
+.spreadsheet .table .selection {
+	position: absolute;
+	border: 2px solid var(--color-accent);
+	pointer-events: none;
+	transition: all 0.1s ease-in-out;
+}
+
 .spreadsheet .table .sheets {
 	position: fixed;
 
@@ -201,14 +208,6 @@
 .propertie-item svg {
 	width: 24px;
 	height: 24px;
-}
-
-/* Selection cells */
-.selection {
-	position: absolute;
-	border: 2px solid var(--color-accent);
-	pointer-events: none;
-	transition: all 0.1s ease-in-out;
 }
 
 /* Sheets Menu */

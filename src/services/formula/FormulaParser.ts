@@ -1,15 +1,22 @@
-import { DataManager } from "../data/DataManager";
+import CellManager from "../cell/CellManager";
 import { Token, TokenType, tokenize } from "./FormulaLexer";
+import {
+	Binary,
+	Func,
+	LinkCell,
+	Node,
+	NopNode,
+	Num,
+	Prop,
+	Str,
+} from "./FormulaNode";
 
-export default function parseFormula(
-	formula: string,
-	dataManager: DataManager
-): Node {
+export default function parseFormula(formula: string): Node {
 	const tokens = tokenize(formula);
-	return parseTokens(tokens, dataManager);
+	return parseTokens(tokens);
 }
 
-function parseTokens(tokens: Token[], dataManager: DataManager): Node {
+function parseTokens(tokens: Token[]): Node {
 	let node: Node = new NopNode();
 
 	for (let index = 0; index < tokens.length; index++) {
@@ -17,17 +24,13 @@ function parseTokens(tokens: Token[], dataManager: DataManager): Node {
 
 		switch (token.tokenDefinition.type) {
 			case TokenType.CELL:
-				node = new LinkCell(
-					...getIndexColRow(token.value),
-					dataManager
-				);
+				node = new LinkCell(...getIndexColRow(token.value));
 				break;
 			case TokenType.PARENTHESIS: {
 				const endParenthesisIndex =
 					findClosingParenthesisIndex(tokens, index) + 1;
 				node = parseTokens(
-					tokens.slice(index + 1, endParenthesisIndex),
-					dataManager
+					tokens.slice(index + 1, endParenthesisIndex)
 				);
 				break;
 			}
@@ -36,8 +39,8 @@ function parseTokens(tokens: Token[], dataManager: DataManager): Node {
 				if (op) {
 					return new Binary(
 						node,
-						parseTokens(tokens.slice(index + 1), dataManager),
-						op
+						parseTokens(tokens.slice(index + 1)),
+						op.getFormula
 					);
 				}
 				break;
@@ -46,7 +49,9 @@ function parseTokens(tokens: Token[], dataManager: DataManager): Node {
 				node = new Num(parseFloat(token.value));
 				break;
 			case TokenType.ID: {
-				const propValue = dataManager.getPropValue(token.value);
+				const propValue = CellManager.instance.getPropValue(
+					token.value
+				);
 				if (propValue) {
 					node = new Prop(propValue);
 					break;
@@ -56,12 +61,11 @@ function parseTokens(tokens: Token[], dataManager: DataManager): Node {
 							const [nodes, endIndex] = getNodes(
 								tokens,
 								index + 1,
-								func.lenght,
-								dataManager
+								func.lenght
 							);
 							index = endIndex;
 
-							node = new Func(func, nodes);
+							node = new Func(func.call, nodes);
 							break;
 						}
 					}
@@ -78,104 +82,10 @@ function parseTokens(tokens: Token[], dataManager: DataManager): Node {
 	return node;
 }
 
-export abstract class Node {
-	abstract getString(): string;
-	getNumber() {
-		return parseFloat(this.getString());
-	}
-	getBoolean() {
-		return this.getString() === "true";
-	}
-}
-class NopNode extends Node {
-	getString(): string {
-		return "Error";
-	}
-}
-class LinkCell extends Node {
-	row: number;
-	column: number;
-	dataManager: DataManager;
-	constructor(column: number, row: number, dataManager: DataManager) {
-		super();
-		this.column = column;
-		this.row = row;
-		this.dataManager = dataManager;
-	}
-	getString(): string {
-		return this.dataManager.getCellText(this.column, this.row);
-	}
-}
-class Binary extends Node {
-	a: Node;
-	b: Node;
-	op: Arithmetic;
-	constructor(a: Node, b: Node, op: Arithmetic) {
-		super();
-		this.a = a;
-		this.b = b;
-		this.op = op;
-	}
-	getString(): string {
-		return this.op
-			.getFormula(this.a.getNumber(), this.b.getNumber())
-			.toString();
-	}
-	getNumber(): number {
-		return this.op.getFormula(this.a.getNumber(), this.b.getNumber());
-	}
-}
-class Num extends Node {
-	num: number;
-	constructor(num: number) {
-		super();
-		this.num = num;
-	}
-	getString(): string {
-		return this.num.toString();
-	}
-	getNumber(): number {
-		return this.num;
-	}
-}
-class Prop extends Node {
-	propValue: string;
-	constructor(propValue: string) {
-		super();
-		this.propValue = propValue;
-	}
-	getString(): string {
-		return this.propValue;
-	}
-}
-class Str extends Node {
-	str: string;
-	constructor(str: string) {
-		super();
-		this.str = str;
-	}
-	getString(): string {
-		return this.str;
-	}
-}
-class Func extends Node {
-	para: Node[];
-	func: FX;
-	constructor(func: FX, para: Node[]) {
-		super();
-		this.func = func;
-		this.para = para;
-	}
-	getString(): string {
-		return this.func.call(this.para).getString();
-	}
-}
-
 function getNodes(
 	tokens: Token[],
 	index: number,
-	lenght: number,
-	dataManager: DataManager
+	lenght: number
 ): [Node[], number] {
 	const endParenthesisIndex = findClosingParenthesisIndex(tokens, index);
 
@@ -185,15 +95,13 @@ function getNodes(
 	for (let i = index + 1; i < endParenthesisIndex - 1; i++) {
 		const token = tokens[i];
 		if (token.value === ";") {
-			nodes.push(parseTokens(tokens.slice(startIndex, i), dataManager));
+			nodes.push(parseTokens(tokens.slice(startIndex, i)));
 			startIndex = i + 1;
 		} else if (token.value === "(") {
 			i = findClosingParenthesisIndex(tokens, i);
 		}
 	}
-	nodes.push(
-		parseTokens(tokens.slice(startIndex, endParenthesisIndex), dataManager)
-	);
+	nodes.push(parseTokens(tokens.slice(startIndex, endParenthesisIndex)));
 
 	return [nodes, endParenthesisIndex];
 }

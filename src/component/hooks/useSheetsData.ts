@@ -1,38 +1,30 @@
 import { useState } from "react";
-import { DataManager, Sheet } from "src/services/data/DataManager";
+import CellManager from "src/services/cell/CellManager";
+import { SSData, Sheet } from "src/services/data/DataManager";
+import { createNewSheet } from "src/services/data/SpreadSheetCreator";
 
-const useSheetsData: (dataManager: DataManager) => SheetsData = (
-	dataManager: DataManager
-) => {
-	const [sheets, setSheets] = useState<Sheet[]>(dataManager.data.sheets);
-
+const useSheetsData: (data: SSData) => SheetsData = (data) => {
 	const [currentSheet, setCurrentSheet] = useState<number>(0);
 
 	function changeSheet(indexSheet: number) {
 		setCurrentSheet(indexSheet);
+		CellManager.instance.setSheet(data.sheets[currentSheet]);
 	}
 
 	function addSheet() {
-		const lastIndex = dataManager.addSheet(); // add new sheet to backend
-		const newSheet = dataManager.getSheets()[lastIndex];
-		if (newSheet) {
-			setSheets([...sheets, newSheet]); // add the new sheet frontend
-			changeSheet(lastIndex); //set new sheet as current
-		}
+		const newSheet = createNewSheet("untilted");
+		const lastIndex = data.sheets.push(newSheet) - 1;
+		changeSheet(lastIndex);
 	}
 
 	function renameSheet(indexSheet: number, newName: string) {
-		dataManager.changeSheetName(indexSheet, newName);
-		setSheets((sheets) => {
-			sheets[indexSheet].name = newName;
-			return sheets;
-		});
+		data.sheets[indexSheet].name = newName;
 	}
 
 	return {
-		sheets,
+		sheets: data.sheets,
 		currentSheetIndex: currentSheet,
-		currentSheet: sheets[currentSheet],
+		currentSheet: data.sheets[currentSheet],
 		addSheet,
 		renameSheet,
 		changeSheet,

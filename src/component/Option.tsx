@@ -1,6 +1,8 @@
 import * as React from "react";
 import CellConfig, { Alignment } from "src/services/cell/CellConfig";
+import { SSData } from "src/services/data/DataManager";
 import Cell, { CellPos } from "../services/cell/Cell";
+import useOptions from "./hooks/useOptions";
 import useSelection from "./hooks/useSelection";
 import { TableData } from "./hooks/useTable";
 
@@ -9,10 +11,17 @@ TODO :
 - color/bgcolor
 - update size
 */
-const Option: React.FC<{ tableData: TableData }> = ({ tableData }) => {
+const Option: React.FC<{ tableData: TableData; data: SSData }> = ({
+	tableData,
+	data,
+}) => {
 	console.log("Render Option");
 
+	const textColorRef = React.useRef<HTMLInputElement>(null);
+	const textBackgroundRef = React.useRef<HTMLInputElement>(null);
+
 	const { selection } = useSelection();
+	const { addColor } = useOptions(data);
 
 	function setConfig(
 		configCallback: (config: CellConfig, most: boolean) => CellConfig,
@@ -175,8 +184,20 @@ const Option: React.FC<{ tableData: TableData }> = ({ tableData }) => {
 			</OptionItem>
 			<div className="seperator" />
 			<OptionItem>
-				<input type="color" />
-				<button>
+				<input type="color" ref={textColorRef} />
+				<button
+					onClick={() =>
+						setConfig((config) =>
+							config.setTextColor(
+								addColor(
+									textColorRef.current
+										? textColorRef.current.value
+										: "000000"
+								)
+							)
+						)
+					}
+				>
 					<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
 						<path
 							fill="currentColor"
@@ -186,8 +207,20 @@ const Option: React.FC<{ tableData: TableData }> = ({ tableData }) => {
 				</button>
 			</OptionItem>
 			<OptionItem>
-				<input type="color" />
-				<button>
+				<input type="color" ref={textBackgroundRef} />
+				<button
+					onClick={() =>
+						setConfig((config) =>
+							config.setBackgroundColor(
+								addColor(
+									textBackgroundRef.current
+										? textBackgroundRef.current.value
+										: "000000"
+								)
+							)
+						)
+					}
+				>
 					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
 						<path
 							fill="currentColor"
