@@ -9,11 +9,23 @@ const useSelection: () => SelectionData = () => {
 	const [startSelection, setStartSelection] = useState<CellPos>([0, 0]);
 	const [onSelectionMode, setSelectionMode] = useState<boolean>(false); // is selection cells mode
 
+	const setSelection2 = (newSelection: Selection) => {
+		if (!selectionEqual(selection, newSelection)) {
+			setSelection(newSelection);
+		}
+	};
+
+	const setStartSelection2 = (newStart: CellPos) => {
+		if (!posEqual(startSelection, newStart)) {
+			setStartSelection(newStart);
+		}
+	};
+
 	const startNewSelection = (pos: CellPos) => {
 		setSelectionMode(true);
 
-		setStartSelection(pos);
-		setSelection([pos, pos]);
+		setStartSelection2(pos);
+		setSelection2([pos, pos]);
 	};
 
 	const endSelection = (pos: CellPos) => {
@@ -31,10 +43,10 @@ const useSelection: () => SelectionData = () => {
 		isStart = false
 	) => {
 		if (isStart) {
-			setStartSelection(posStart);
+			setStartSelection2(posStart);
 		}
 
-		setSelection(orderSelection(posStart, posEnd));
+		setSelection2(orderSelection(posStart, posEnd));
 	};
 
 	function orderSelection(posA: CellPos, posB: CellPos): [CellPos, CellPos] {
@@ -81,4 +93,18 @@ export interface SelectionData {
 	updateSelection: (pos: CellPos) => void;
 	startNewSelection: (pos: CellPos) => void;
 	endSelection: (pos: CellPos) => void;
+}
+
+export function selectionEqual(
+	selectionPrev: Selection,
+	selectionNext: Selection
+) {
+	return (
+		posEqual(selectionPrev[0], selectionNext[0]) &&
+		posEqual(selectionPrev[1], selectionNext[1])
+	);
+}
+
+export function posEqual(pos1: CellPos, pos2: CellPos) {
+	return pos1[0] === pos2[0] && pos1[1] === pos2[1];
 }

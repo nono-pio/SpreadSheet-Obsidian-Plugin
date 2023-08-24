@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Cell, { CellPos } from "src/services/cell/Cell";
 import Column from "src/services/cell/Column";
 import DefaultCell from "src/services/cell/DefaultCell";
@@ -6,6 +7,16 @@ import { Sheet } from "src/services/data/DataManager";
 import { parserCell } from "src/services/file/FileParser";
 
 const useTable: (sheet: Sheet) => TableData = (sheet) => {
+	const [tableChange, setChangeTable] = useState<boolean>(false);
+
+	function changeTable() {
+		setChangeTable(true);
+	}
+
+	function resetTableChange() {
+		setChangeTable(false);
+	}
+
 	function rowsLenght() {
 		return sheet.table.length;
 	}
@@ -52,10 +63,12 @@ const useTable: (sheet: Sheet) => TableData = (sheet) => {
 	}
 
 	function addMaxColumn() {
+		changeTable();
 		sheet.columns.push(new Column());
 	}
 
 	function addMaxRow() {
+		changeTable();
 		sheet.rows.push(new Row());
 	}
 
@@ -92,6 +105,9 @@ const useTable: (sheet: Sheet) => TableData = (sheet) => {
 		updateCell,
 		getCell,
 		getCellContent,
+		tableChange,
+		changeTable,
+		resetTableChange,
 	};
 };
 
@@ -103,4 +119,7 @@ export interface TableData {
 	updateCell: (pos: CellPos, newValue: string, keepConfig?: boolean) => void;
 	getCell: (pos: CellPos) => Cell | undefined;
 	getCellContent: (pos: CellPos) => string;
+	tableChange: boolean;
+	changeTable: () => void;
+	resetTableChange: () => void;
 }

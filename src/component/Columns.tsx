@@ -14,7 +14,6 @@ const Columns: React.FC<{
 				<th
 					key={columnIndex}
 					className={
-						selection &&
 						columnIndex >= selection[0][0] &&
 						columnIndex <= selection[1][0]
 							? "active"

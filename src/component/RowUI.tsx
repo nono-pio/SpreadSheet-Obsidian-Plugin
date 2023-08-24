@@ -13,9 +13,7 @@ const RowUI: React.FC<{
 		<th
 			key={rowIndex}
 			className={
-				selection &&
-				rowIndex >= selection[0][1] &&
-				rowIndex <= selection[1][1]
+				rowIndex >= selection[0][1] && rowIndex <= selection[1][1]
 					? "active"
 					: ""
 			}

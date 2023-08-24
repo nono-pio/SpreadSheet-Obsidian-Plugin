@@ -1,6 +1,3 @@
-import * as CSS from "csstype";
-import { DataManager } from "../data/DataManager";
-
 export default class CellConfig {
 	alignment: Alignment = Alignment.Left;
 
@@ -40,36 +37,6 @@ export default class CellConfig {
 	setTextSize(size: number) {
 		this.textSize = size;
 		return this;
-	}
-
-	generateStyle(dataManager: DataManager): React.CSSProperties {
-		return {
-			fontWeight: this.textBold ? "bold" : "normal",
-			fontStyle: this.textItalic ? "italic" : "normal",
-			textAlign: this.generateAlignement(),
-			color:
-				this.colorText !== null
-					? dataManager.getColor(this.colorText)
-					: "inherit",
-			backgroundColor:
-				this.colorBackground !== null
-					? dataManager.getColor(this.colorBackground)
-					: "inherit",
-			fontSize: this.textSize === -1 ? undefined : this.textSize,
-		};
-	}
-
-	generateAlignement(): CSS.Property.TextAlign | undefined {
-		switch (this.alignment) {
-			case Alignment.Left:
-				return "left";
-			case Alignment.Center:
-				return "center";
-			case Alignment.Right:
-				return "right";
-			default:
-				return undefined;
-		}
 	}
 
 	getString() {

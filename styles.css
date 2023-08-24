@@ -111,7 +111,7 @@
 			background-color: var(--color-base-10);
 		}
 
-		& .column-active {
+		& .active {
 			box-shadow: inset 0 -12px 10px -10px var(--color-accent);
 			transition: box-shadow 0.3s ease-in-out;
 		}
@@ -124,7 +124,7 @@
 		background-color: var(--color-base-10);
 		border-left: none;
 
-		& .row-active {
+		&.active {
 			box-shadow: inset -12px 0 10px -10px var(--color-accent);
 			transition: box-shadow 0.3s ease-in-out;
 		}

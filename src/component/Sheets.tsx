@@ -1,7 +1,21 @@
-import * as React from "react";
+import React, { FC } from "react";
 import { SheetsData } from "./hooks/useSheetsData";
 
-const Sheets: React.FC<{ sheetsData: SheetsData }> = ({ sheetsData }) => {
+interface SheetsProps {
+	sheetsData: SheetsData;
+}
+
+const Sheets: FC<SheetsProps> = ({ sheetsData }) => {
+	const handleButtonClick = (index: number) => {
+		if (index !== sheetsData.currentSheetIndex) {
+			sheetsData.changeSheet(index);
+		}
+	};
+
+	const handleBlur = (index: number, newName: string | null) => {
+		sheetsData.renameSheet(index, newName || "error");
+	};
+
 	return (
 		<div className="sheets">
 			{sheetsData.sheets.map((sheet, index) => (
@@ -12,25 +26,15 @@ const Sheets: React.FC<{ sheetsData: SheetsData }> = ({ sheetsData }) => {
 							? "active sheet-btn"
 							: "sheet-btn"
 					}
-					onBlur={(e) =>
-						sheetsData.renameSheet(
-							index,
-							e.target.textContent
-								? e.target.textContent
-								: "error"
-						)
-					}
-					onClick={() => {
-						if (index !== sheetsData.currentSheetIndex)
-							sheetsData.changeSheet(index);
-					}}
+					onBlur={(e) => handleBlur(index, e.target.textContent)}
+					onClick={() => handleButtonClick(index)}
 					contentEditable
 					suppressContentEditableWarning
 				>
 					{sheet.name}
 				</button>
 			))}
-			<button onClick={() => sheetsData.addSheet()}>Add Sheet</button>
+			<button onClick={sheetsData.addSheet}>Add Sheet</button>
 		</div>
 	);
 };
