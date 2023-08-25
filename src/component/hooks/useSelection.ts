@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { CellPos } from "src/services/cell/Cell";
+import Cell, { CellPos } from "src/services/cell/Cell";
+import { TableData } from "./useTable";
 
 const useSelection: () => SelectionData = () => {
 	const [selection, setSelection] = useState<Selection>([
@@ -21,20 +22,28 @@ const useSelection: () => SelectionData = () => {
 		}
 	};
 
+	const oneCellSelection = (pos: CellPos, startPos: boolean) => {
+		setSelection2([pos, pos]);
+		if (startPos) {
+			setStartSelection2(pos);
+		}
+	};
+
 	const startNewSelection = (pos: CellPos) => {
 		setSelectionMode(true);
 
-		setStartSelection2(pos);
-		setSelection2([pos, pos]);
+		oneCellSelection(pos, true);
 	};
 
 	const endSelection = (pos: CellPos) => {
 		setSelectionMode(false);
-		updateSelection(pos);
+		setAndOrderSelection([...startSelection], pos);
 	};
 
 	const updateSelection = (pos: CellPos) => {
-		setAndOrderSelection([...startSelection], pos);
+		if (onSelectionMode) {
+			setAndOrderSelection([...startSelection], pos);
+		}
 	};
 
 	const setAndOrderSelection: SetSelection = (
@@ -65,6 +74,29 @@ const useSelection: () => SelectionData = () => {
 		return [posA, posB];
 	}
 
+	function foreachSelectionCellsPos(
+		callback: (row: number, column: number) => void
+	) {
+		for (let row = selection[0][1]; row <= selection[1][1]; row++) {
+			for (
+				let column = selection[0][0];
+				column <= selection[1][0];
+				column++
+			) {
+				callback(row, column);
+			}
+		}
+	}
+
+	function foreachSelectionCells(
+		callback: (cell: Cell | undefined, row: number, column: number) => void,
+		tableData: TableData
+	) {
+		foreachSelectionCellsPos((row, col) =>
+			callback(tableData.getCell([col, row]), row, col)
+		);
+	}
+
 	return {
 		selection,
 		startSelection,
@@ -73,6 +105,9 @@ const useSelection: () => SelectionData = () => {
 		updateSelection,
 		startNewSelection,
 		endSelection,
+		foreachSelectionCells,
+		foreachSelectionCellsPos,
+		oneCellSelection,
 	};
 };
 
@@ -93,6 +128,14 @@ export interface SelectionData {
 	updateSelection: (pos: CellPos) => void;
 	startNewSelection: (pos: CellPos) => void;
 	endSelection: (pos: CellPos) => void;
+	foreachSelectionCells: (
+		callback: (cell: Cell | undefined, row: number, column: number) => void,
+		tableData: TableData
+	) => void;
+	foreachSelectionCellsPos: (
+		callback: (row: number, column: number) => void
+	) => void;
+	oneCellSelection: (pos: CellPos, startPos: boolean) => void;
 }
 
 export function selectionEqual(

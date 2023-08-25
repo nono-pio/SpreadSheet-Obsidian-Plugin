@@ -64,27 +64,24 @@ const useTable: (sheet: Sheet) => TableData = (sheet) => {
 
 	function addMaxColumn() {
 		changeTable();
-		sheet.columns.push(new Column());
+		sheet.columns.push(new Column(null, sheet.columns.length));
 	}
 
 	function addMaxRow() {
 		changeTable();
-		sheet.rows.push(new Row());
+		sheet.rows.push(new Row(null, sheet.rows.length));
 	}
 
 	function updateCell(pos: CellPos, newValue: string, keepConfig = true) {
 		const oldCell = getCell(pos);
 
 		if (oldCell && newValue !== oldCell.getData()) {
-			console.log("update Table");
 			sheet.table[pos[1]][pos[0]] = parserCell(
 				// return default/formula cell
 				newValue,
 				keepConfig ? oldCell.config : null
 			);
 		} else if (!oldCell && newValue !== "") {
-			console.log("update Table with expend");
-
 			updateTable(pos); // expend table to cell needed
 			sheet.table[pos[1]][pos[0]] = parserCell(newValue, null);
 		}
@@ -108,6 +105,8 @@ const useTable: (sheet: Sheet) => TableData = (sheet) => {
 		tableChange,
 		changeTable,
 		resetTableChange,
+		columnLenght: columnsLenght(),
+		rowLenght: rowsLenght(),
 	};
 };
 
@@ -122,4 +121,6 @@ export interface TableData {
 	tableChange: boolean;
 	changeTable: () => void;
 	resetTableChange: () => void;
+	columnLenght: number;
+	rowLenght: number;
 }

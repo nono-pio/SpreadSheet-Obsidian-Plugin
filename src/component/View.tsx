@@ -48,6 +48,7 @@ const View: React.FC<ViewProps> = ({ data }) => {
 					tableData={tableData}
 					selectionData={selectionData}
 					style={style}
+					getCellElement={getCellElement}
 				/>
 				<Sheets sheetsData={sheetsData} />
 				<SelectionBox

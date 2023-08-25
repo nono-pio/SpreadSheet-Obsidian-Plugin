@@ -1,18 +1,24 @@
 import CellConfig from "./CellConfig";
 
 export default class Column {
-	value: string | null;
+	value: string;
+	index: number;
 	config: CellConfig | null;
-	constructor(value: string | null = null, config: CellConfig | null = null) {
+	constructor(
+		value: string | null,
+		index: number,
+		config: CellConfig | null = null
+	) {
 		this.config = config;
-		this.value = value;
+		this.value = value || Column.toLetter(index);
+		this.index = index;
 	}
 
-	getText(index: number): string {
-		return this.value ? this.value : this.toLetter(index);
+	getText(): string {
+		return this.value;
 	}
 
-	toIndex(str: string): number {
+	static toIndex(str: string): number {
 		const base = "A".charCodeAt(0) - 1;
 		const chars = str.toUpperCase().split("").reverse();
 		let result = 0;
@@ -25,7 +31,7 @@ export default class Column {
 		return result - 1;
 	}
 
-	toLetter(index: number): string {
+	static toLetter(index: number): string {
 		const base = "A".charCodeAt(0);
 		let quotient = index + 1;
 		let result = "";
@@ -40,6 +46,6 @@ export default class Column {
 	}
 
 	getData() {
-		return this.value ? this.value : "";
+		return this.value === Column.toLetter(this.index) ? "" : this.value;
 	}
 }

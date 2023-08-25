@@ -42,11 +42,14 @@ function parseSheet(sheet: PSheet): Sheet {
 	const columnSTR = csv1D(sheet.columns);
 	const columns = Array.from(
 		{ length: columnSTR.length },
-		() => new Column()
+		(_, i) => new Column(null, i)
 	);
 
 	const rowSTR = csv1D(sheet.rows);
-	const rows = Array.from({ length: rowSTR.length }, () => new Row());
+	const rows = Array.from(
+		{ length: rowSTR.length },
+		(_, i) => new Row(null, i)
+	);
 
 	return new Sheet(sheet.name, table, columns, rows);
 }

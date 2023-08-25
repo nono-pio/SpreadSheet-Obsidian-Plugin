@@ -4,24 +4,23 @@ import { Selection, SetSelection } from "./hooks/useSelection";
 
 const RowUI: React.FC<{
 	row: Row;
-	rowIndex: number;
 	selection: Selection;
 	columnLenght: number;
 	setSelection: SetSelection;
-}> = ({ row, rowIndex, selection, columnLenght, setSelection }) => {
+}> = ({ row, selection, columnLenght, setSelection }) => {
 	return (
 		<th
-			key={rowIndex}
+			key={row.index}
 			className={
-				rowIndex >= selection[0][1] && rowIndex <= selection[1][1]
+				row.index >= selection[0][1] && row.index <= selection[1][1]
 					? "active"
 					: ""
 			}
 			onClick={() =>
-				setSelection([0, rowIndex], [columnLenght, rowIndex], true)
+				setSelection([0, row.index], [columnLenght, row.index], true)
 			}
 		>
-			{row.getText(rowIndex)}
+			{row.getText()}
 		</th>
 	);
 };

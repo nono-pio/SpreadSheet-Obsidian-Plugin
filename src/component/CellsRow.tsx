@@ -7,32 +7,29 @@ import { TableData } from "./hooks/useTable";
 
 const CellsRow: React.FC<{
 	columns: Column[];
-	rowIndex: number;
 	row: Row;
 	selectionData: SelectionData;
 	tableData: TableData;
 	style: Style;
-}> = ({ columns, rowIndex, selectionData, tableData, style, row }) => {
+}> = ({ columns, selectionData, tableData, style, row }) => {
 	function onMouseDown(column: number) {
-		selectionData.startNewSelection([column, rowIndex]);
+		selectionData.startNewSelection([column, row.index]);
 	}
 	function onMouseUp(column: number) {
-		selectionData.endSelection([column, rowIndex]);
+		selectionData.endSelection([column, row.index]);
 	}
 	function onMouseEnter(column: number) {
-		if (selectionData.onSelectionMode) {
-			selectionData.updateSelection([column, rowIndex]);
-		}
+		selectionData.updateSelection([column, row.index]);
 	}
 	function onBlur(column: number, value: string | null) {
-		tableData.updateCell([column, rowIndex], value ? value : "");
+		tableData.updateCell([column, row.index], value ? value : "");
 	}
 
 	function onContextMenu(column: number) {}
 	return (
 		<>
 			{columns.map((column, columnIndex) => {
-				const cell = tableData.getCell([columnIndex, rowIndex]);
+				const cell = tableData.getCell([columnIndex, row.index]);
 				let content = "";
 				let cellStyle: React.CSSProperties | undefined = undefined;
 				if (cell) {
@@ -50,7 +47,6 @@ const CellsRow: React.FC<{
 						onMouseDown={() => onMouseDown(columnIndex)}
 						onMouseEnter={() => onMouseEnter(columnIndex)}
 						onMouseUp={() => onMouseUp(columnIndex)}
-						onKeyDown={(e) => console.log(e.key)}
 						style={cellStyle}
 						contentEditable="true"
 						suppressContentEditableWarning

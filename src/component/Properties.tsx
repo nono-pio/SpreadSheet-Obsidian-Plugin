@@ -1,6 +1,7 @@
 import * as React from "react";
 import { TableProps } from "./SSTable";
 
+// TODO make properties
 const Properties = ({ dataManager, setTableData, tableData }: TableProps) => {
 	const refNewName = React.useRef<HTMLInputElement>(null);
 	const refNewValue = React.useRef<HTMLInputElement>(null);

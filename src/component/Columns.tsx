@@ -27,7 +27,7 @@ const Columns: React.FC<{
 						)
 					}
 				>
-					{column.getText(columnIndex)}
+					{column.getText()}
 				</th>
 			))}
 		</>

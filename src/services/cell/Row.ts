@@ -1,18 +1,24 @@
 import CellConfig from "./CellConfig";
 
 export default class Row {
-	value: string | null;
+	value: string;
+	index: number;
 	config: CellConfig | null;
-	constructor(value: string | null = null, config: CellConfig | null = null) {
+	constructor(
+		value: string | null,
+		index: number,
+		config: CellConfig | null = null
+	) {
 		this.config = config;
-		this.value = value;
+		this.value = value || index + 1 + "";
+		this.index = index;
 	}
 
-	getText(index: number): string {
-		return "" + (index + 1);
+	getText(): string {
+		return this.value;
 	}
 
 	getData() {
-		return this.value ? this.value : "";
+		return this.value === this.index + 1 + "" ? "" : this.value;
 	}
 }
